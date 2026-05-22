@@ -4,21 +4,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}MASXMENOS{% endblock %}</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>
+        {% block title %}
+            MASXMENOS
+        {% endblock %}
+    </title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
 </head>
 
 <body>
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+
         <div class="container">
 
-            <a class="navbar-brand" href="/">
+            <a class="navbar-brand" href="{% url 'inicio' %}">
                 MASXMENOS
             </a>
 
-            <div class="ms-auto">
+            <button
+                class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarNav"
+                aria-controls="navbarNav"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+            >
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+
+                <ul class="navbar-nav me-auto">
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'inicio' %}">
+                            Inicio
+                        </a>
+                    </li>
+
+                </ul>
 
                 {% if user.is_authenticated %}
 
@@ -26,26 +57,39 @@
                         {{ user.username }}
                     </span>
 
-                    <form method="post" action="{% url 'logout' %}" style="display:inline;">
+                    <form method="post" action="{% url 'logout' %}">
                         {% csrf_token %}
-                        <button class="btn btn-light btn-sm">
+
+                        <button type="submit" class="btn btn-light btn-sm">
                             Salir
                         </button>
                     </form>
+
+                {% else %}
+
+                    <a
+                        href="{% url 'login' %}"
+                        class="btn btn-light btn-sm"
+                    >
+                        Iniciar sesión
+                    </a>
 
                 {% endif %}
 
             </div>
 
         </div>
+
     </nav>
 
-    <div class="container mt-4">
+    <main class="container mt-4">
 
         {% block content %}
         {% endblock %}
 
-    </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 
