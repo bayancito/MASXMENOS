@@ -40,6 +40,14 @@ class Producto(models.Model):
         blank=True,
         null=True
     )
+    
+    categoria = models.ForeignKey(
+    Categoria,
+    on_delete=models.PROTECT,
+    related_name='productos',
+    null=True,
+    blank=True
+    )
 
     imagen = models.ImageField(
         upload_to='productos/',
