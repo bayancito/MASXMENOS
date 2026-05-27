@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Productos
+{% endblock %}
+
+{% block content %}
+
+<h2>Productos Registrados</h2>
+
+<a href="{% url 'crear_producto' %}"
+   class="btn btn-success mb-3">
+
+    Nuevo Producto
+
+</a>
+
+<table class="table table-striped">
+
+    <thead>
+
+        <tr>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th>Activo</th>
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+        {% for producto in productos %}
+
+        <tr>
+
+            <td>{{ producto.nombre }}</td>
+
+            <td>
+                {{ producto.categoria }}
+            </td>
+
+            <td>
+                {{ producto.activo }}
+            </td>
+
+        </tr>
+
+        {% empty %}
+
+        <tr>
+
+            <td colspan="3">
+                No existen productos registrados
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </tbody>
+
+</table>
+
+{% endblock %}

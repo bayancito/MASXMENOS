@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 
 from .forms import ProductoForm
-
+from .models import Producto
 
 def crear_producto(request):
 
@@ -27,5 +27,16 @@ def crear_producto(request):
         'productos/crear_producto.html',
         {
             'form': form
+        }
+    )
+def lista_productos(request):
+
+    productos = Producto.objects.all()
+
+    return render(
+        request,
+        'productos/lista_productos.html',
+        {
+            'productos': productos
         }
     )
