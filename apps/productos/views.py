@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 
 from .forms import ProductoForm
 from .models import Producto
-
+from .forms import ProductoForm
 def crear_producto(request):
 
     if request.method == 'POST':
@@ -41,6 +41,7 @@ def lista_productos(request):
         }
     )
 
+
 def detalle_producto(request, pk):
 
     producto = get_object_or_404(
@@ -52,6 +53,44 @@ def detalle_producto(request, pk):
         request,
         'productos/detalle_producto.html',
         {
+            'producto': producto
+        }
+    )
+def editar_producto(request, pk):
+
+    producto = get_object_or_404(
+        Producto,
+        pk=pk
+    )
+
+    if request.method == 'POST':
+
+        form = ProductoForm(
+            request.POST,
+            request.FILES,
+            instance=producto
+        )
+
+        if form.is_valid():
+
+            form.save()
+
+            return redirect(
+                'detalle_producto',
+                pk=producto.pk
+            )
+
+    else:
+
+        form = ProductoForm(
+            instance=producto
+        )
+
+    return render(
+        request,
+        'productos/editar_producto.html',
+        {
+            'form': form,
             'producto': producto
         }
     )
