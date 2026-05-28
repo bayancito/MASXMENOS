@@ -29,33 +29,39 @@ Productos
 
     <tbody>
 
-        {% for producto in productos %}
+       {% for producto in productos %}
 
-        <tr>
+            <tr>
 
-            <td>{{ producto.nombre }}</td>
+                <td>
 
-            <td>
-                {{ producto.categoria }}
-            </td>
+                    <a href="{% url 'detalle_producto' producto.id %}">
+                        {{ producto.nombre }}
+                    </a>
 
-            <td>
-                {{ producto.activo }}
-            </td>
+                </td>
 
-        </tr>
+                <td>
+                    {{ producto.categoria }}
+                </td>
 
-        {% empty %}
+                <td>
+                    {{ producto.activo }}
+                </td>
 
-        <tr>
+            </tr>
 
-            <td colspan="3">
-                No existen productos registrados
-            </td>
+            {% empty %}
 
-        </tr>
+            <tr>
 
-        {% endfor %}
+                <td colspan="3">
+                    No existen productos registrados
+                </td>
+
+            </tr>
+
+            {% endfor %}
 
     </tbody>
 

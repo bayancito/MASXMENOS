@@ -2,7 +2,8 @@ from django.urls import path
 
 from .views import (
     crear_producto,
-    lista_productos
+    lista_productos,
+    detalle_producto
 )
 
 urlpatterns = [
@@ -17,6 +18,12 @@ urlpatterns = [
         'nuevo/',
         crear_producto,
         name='crear_producto'
+    ),
+
+     path(
+        '<int:pk>/',
+        detalle_producto,
+        name='detalle_producto'
     ),
 
 ]
