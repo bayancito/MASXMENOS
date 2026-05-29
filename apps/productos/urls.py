@@ -4,7 +4,8 @@ from .views import (
     crear_producto,
     lista_productos,
     detalle_producto,
-    editar_producto
+    editar_producto,
+    eliminar_producto
 )
 
 urlpatterns = [
@@ -31,6 +32,12 @@ urlpatterns = [
         '<int:pk>/editar/',
         editar_producto,
         name='editar_producto'
+    ),
+
+    path(
+    '<int:pk>/eliminar/',
+    eliminar_producto,
+    name='eliminar_producto'
     ),
 
 ]

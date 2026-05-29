@@ -94,3 +94,26 @@ def editar_producto(request, pk):
             'producto': producto
         }
     )
+
+def eliminar_producto(request, pk):
+
+    producto = get_object_or_404(
+        Producto,
+        pk=pk
+    )
+
+    if request.method == 'POST':
+
+        producto.delete()
+
+        return redirect(
+            'lista_productos'
+        )
+
+    return render(
+        request,
+        'productos/eliminar_producto.html',
+        {
+            'producto': producto
+        }
+    )
