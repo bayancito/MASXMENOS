@@ -20,6 +20,7 @@ Productos
     <thead>
 
         <tr>
+            <th>Imagen</th>
             <th>Nombre</th>
             <th>Categoría</th>
             <th>Activo</th>
@@ -32,6 +33,15 @@ Productos
        {% for producto in productos %}
 
             <tr>
+                 <td>
+
+                    {% if producto.imagen %}
+                        <img
+                            src="{{ producto.imagen.url }}"
+                            width="80">
+                    {% endif %}
+
+                </td>
 
                 <td>
 
