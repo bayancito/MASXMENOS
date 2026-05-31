@@ -4,6 +4,7 @@ from .forms import ProductoForm
 from .models import Producto
 from .forms import ProductoForm
 from .models import Producto, Categoria
+from django.core.paginator import Paginator
 def crear_producto(request):
 
     if request.method == 'POST':
@@ -57,6 +58,16 @@ def lista_productos(request):
         )
 
     categorias = Categoria.objects.all()
+    paginator = Paginator(
+            productos,
+            10
+        )
+
+    page_number = request.GET.get('page')
+
+    productos = paginator.get_page(
+            page_number
+        )
 
     return render(
         request,
