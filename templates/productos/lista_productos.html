@@ -8,6 +8,76 @@ Productos
 
 <h2>Productos Registrados</h2>
 
+<form method="get" class="mb-3">
+
+    <div class="input-group">
+
+        <input
+            type="text"
+            name="q"
+            value="{{ busqueda }}"
+            class="form-control"
+            placeholder="Buscar producto...">
+
+        <button
+            class="btn btn-primary"
+            type="submit">
+
+            Buscar
+
+        </button>
+
+    </div>
+
+</form>
+<form method="get" class="mb-3">
+
+    <div class="row">
+
+        <div class="col-md-4">
+
+            <select
+                name="categoria"
+                class="form-select">
+
+                <option value="">
+                    Todas las categorías
+                </option>
+
+                {% for categoria in categorias %}
+
+                <option
+                    value="{{ categoria.id }}"
+                    {% if categoria.id|stringformat:"s" == categoria_seleccionada %}
+                    selected
+                    {% endif %}>
+
+                    {{ categoria.nombre }}
+
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+        <div class="col-md-2">
+
+            <button
+                type="submit"
+                class="btn btn-success">
+
+                Filtrar
+
+            </button>
+
+        </div>
+
+    </div>
+
+</form>
+
 <a href="{% url 'crear_producto' %}"
    class="btn btn-success mb-3">
 

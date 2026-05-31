@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import ProductoForm
 from .models import Producto
 from .forms import ProductoForm
+from .models import Producto, Categoria
 def crear_producto(request):
 
     if request.method == 'POST':
@@ -31,13 +32,40 @@ def crear_producto(request):
     )
 def lista_productos(request):
 
+    busqueda = request.GET.get(
+        'q',
+        ''
+    )
+
+    categoria_id = request.GET.get(
+        'categoria',
+        ''
+    )
+
     productos = Producto.objects.all()
+
+    if busqueda:
+
+        productos = productos.filter(
+            nombre__icontains=busqueda
+        )
+
+    if categoria_id:
+
+        productos = productos.filter(
+            categoria_id=categoria_id
+        )
+
+    categorias = Categoria.objects.all()
 
     return render(
         request,
         'productos/lista_productos.html',
         {
-            'productos': productos
+            'productos': productos,
+            'busqueda': busqueda,
+            'categorias': categorias,
+            'categoria_seleccionada': categoria_id
         }
     )
 
