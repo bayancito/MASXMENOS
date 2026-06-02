@@ -1,5 +1,5 @@
 from django.db import models
-
+from apps.productores.models import Productor
 
 class Categoria(models.Model):
 
@@ -48,6 +48,14 @@ class Producto(models.Model):
     null=True,
     blank=True
     )
+    
+    productor = models.ForeignKey(
+    Productor,
+    on_delete=models.CASCADE,
+    related_name='productos',
+    null=True,
+    blank=True
+)
 
     imagen = models.ImageField(
         upload_to='productos/',
