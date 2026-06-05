@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Eliminar Productor
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4">
+        Eliminar Productor
+    </h2>
+
+    <div class="alert alert-danger">
+
+        ¿Está seguro de eliminar el productor:
+
+        <strong>
+            {{ productor.nombre_comercial }}
+        </strong>?
+
+    </div>
+
+    <form method="post">
+
+        {% csrf_token %}
+
+        <button
+            type="submit"
+            class="btn btn-danger"
+        >
+            Eliminar
+        </button>
+
+        <a
+            href="{% url 'detalle_productor' productor.pk %}"
+            class="btn btn-secondary"
+        >
+            Cancelar
+        </a>
+
+    </form>
+
+</div>
+
+{% endblock %}

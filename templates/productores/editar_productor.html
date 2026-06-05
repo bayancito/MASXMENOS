@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Editar productor
+{% endblock %}
+
+{% block content %}
+
+<h1>Editar productor</h1>
+
+<form method="post">
+
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <button
+        type="submit"
+        class="btn btn-success"
+    >
+        Guardar cambios
+    </button>
+
+</form>
+
+{% endblock %}

@@ -1,0 +1,99 @@
+/* MASXMENOS — ajustes mínimos sobre Bootstrap 5 */
+
+body.mxm-body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.mxm-main {
+    flex: 1 0 auto;
+    padding-top: 1.5rem;
+    padding-bottom: 3rem;
+}
+
+.mxm-page-title {
+    margin-bottom: 1.75rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+.mxm-intro {
+    padding: 2.5rem 0 2rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+.mxm-product-thumb {
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+    border-radius: var(--bs-border-radius);
+    border: 1px solid var(--bs-border-color);
+}
+
+.mxm-thumb-placeholder {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--bs-border-radius);
+    background-color: var(--bs-light);
+    border: 1px solid var(--bs-border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--bs-secondary-color);
+    font-size: 0.875rem;
+}
+
+.mxm-footer {
+    flex-shrink: 0;
+    margin-top: auto;
+    padding: 1rem 0;
+    font-size: 0.875rem;
+    color: var(--bs-secondary-color);
+    border-top: 1px solid var(--bs-border-color);
+    background-color: var(--bs-light);
+}
+
+.mxm-footer a {
+    color: var(--bs-secondary-color);
+    text-decoration: none;
+}
+
+.mxm-footer a:hover {
+    color: var(--bs-success);
+    text-decoration: underline;
+}
+
+/* Catálogo — vista tarjetas */
+.mxm-catalog-card {
+    border: 1px solid var(--bs-border-color);
+}
+
+.mxm-catalog-card-img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.mxm-catalog-card-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bs-light);
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+.mxm-catalog-card-meta dt {
+    font-weight: 500;
+}
+
+.mxm-catalog-card .card-title a:hover {
+    color: var(--bs-success);
+}
+
+@media (min-width: 576px) {
+    .mxm-catalog-card-img {
+        height: 200px;
+    }
+}

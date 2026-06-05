@@ -1,50 +1,47 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-success">
+{% extends 'base.html' %}
 
-    <div class="container">
+{% block title %}
+Iniciar Sesión
+{% endblock %}
 
-        <a class="navbar-brand" href="/">
-            MASXMENOS
-        </a>
+{% block content %}
 
-        <button
-            class="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarNav">
+<div class="row justify-content-center mt-5">
 
-            <span class="navbar-toggler-icon"></span>
+    <div class="col-md-4">
 
-        </button>
+        <div class="card shadow">
 
-        <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0">
+                    Iniciar Sesión
+                </h4>
+            </div>
 
-            <ul class="navbar-nav me-auto">
+            <div class="card-body">
 
-                <li class="nav-item">
-                    <a class="nav-link" href="/">
-                        Inicio
-                    </a>
-                </li>
+                <form method="post">
 
-            </ul>
-
-            {% if user.is_authenticated %}
-
-                <span class="text-white me-3">
-                    {{ user.username }}
-                </span>
-
-                <form method="post" action="{% url 'logout' %}">
                     {% csrf_token %}
-                    <button class="btn btn-light btn-sm">
-                        Salir
+
+                    {{ form.as_p }}
+
+                    <button
+                        type="submit"
+                        class="btn btn-success w-100">
+
+                        Ingresar
+
                     </button>
+
                 </form>
 
-            {% endif %}
+            </div>
 
         </div>
 
     </div>
 
-</nav>
+</div>
+
+{% endblock %}

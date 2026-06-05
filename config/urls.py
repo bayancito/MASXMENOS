@@ -21,6 +21,11 @@ urlpatterns = [
         include('apps.productos.urls')
     ),
 
+    path(
+        'productores/',
+        include('apps.productores.urls')
+    ),
+
 ]
 
 
