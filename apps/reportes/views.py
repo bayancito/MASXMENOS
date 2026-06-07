@@ -1,3 +1,5 @@
+import json
+
 from django.db.models import Count
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -30,6 +32,34 @@ def reportes(request):
         total_productores=Count('id')
     ).order_by('municipio')
 
+    productos_por_categoria = Categoria.objects.annotate(
+        total=Count('productos')
+    ).values('nombre', 'total')
+
+    productores_por_municipio = Productor.objects.values(
+        'municipio'
+    ).annotate(
+        total=Count('id')
+    ).order_by('municipio').values('municipio', 'total')
+
+    categorias_labels = [
+        item["nombre"]
+        for item in productos_por_categoria
+    ]
+    categorias_data = [
+        item["total"]
+        for item in productos_por_categoria
+    ]
+
+    municipios_labels = [
+        item["municipio"]
+        for item in productores_por_municipio
+    ]
+    municipios_data = [
+        item["total"]
+        for item in productores_por_municipio
+    ]
+
     total_productos = Producto.objects.count()
     total_productores = Productor.objects.count()
     total_categorias = Categoria.objects.count()
@@ -47,6 +77,14 @@ def reportes(request):
             'total_productores': total_productores,
             'total_categorias': total_categorias,
             'productos_activos': productos_activos,
+            'categorias_labels': categorias_labels,
+            'categorias_data': categorias_data,
+            'municipios_labels': municipios_labels,
+            'municipios_data': municipios_data,
+            'categorias_labels_json': json.dumps(categorias_labels),
+            'categorias_data_json': json.dumps(categorias_data),
+            'municipios_labels_json': json.dumps(municipios_labels),
+            'municipios_data_json': json.dumps(municipios_data),
         },
     )
 

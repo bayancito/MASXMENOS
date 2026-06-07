@@ -154,4 +154,97 @@ Reportes — MASXMENOS
 
 </div>
 
+<div class="row g-4 mt-2">
+    <div class="col-lg-6">
+        <div class="card h-100 border-success border-opacity-25">
+            <div class="card-body">
+                <h2 class="h5 text-secondary mb-3">
+                    Productos por categoría
+                </h2>
+                <div class="position-relative" style="height: 320px;">
+                    <canvas id="graficoCategorias"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card h-100 border-success border-opacity-25">
+            <div class="card-body">
+                <h2 class="h5 text-secondary mb-3">
+                    Productores por municipio
+                </h2>
+                <div class="position-relative" style="height: 320px;">
+                    <canvas id="graficoMunicipios"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    (function () {
+        const categoriasLabels = JSON.parse('{{ categorias_labels_json|escapejs }}');
+        const categoriasData = JSON.parse('{{ categorias_data_json|escapejs }}');
+        const municipiosLabels = JSON.parse('{{ municipios_labels_json|escapejs }}');
+        const municipiosData = JSON.parse('{{ municipios_data_json|escapejs }}');
+
+        const ctxCategorias = document.getElementById('graficoCategorias');
+        if (ctxCategorias) {
+            new Chart(ctxCategorias, {
+                type: 'bar',
+                data: {
+                    labels: categoriasLabels,
+                    datasets: [{
+                        label: 'Productos',
+                        data: categoriasData,
+                        backgroundColor: 'rgba(25, 135, 84, 0.35)',
+                        borderColor: 'rgba(25, 135, 84, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: true }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                maxRotation: 60,
+                                minRotation: 0
+                            }
+                        },
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        const ctxMunicipios = document.getElementById('graficoMunicipios');
+        if (ctxMunicipios) {
+            new Chart(ctxMunicipios, {
+                type: 'pie',
+                data: {
+                    labels: municipiosLabels,
+                    datasets: [{
+                        data: municipiosData
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+    })();
+</script>
+
 {% endblock %}

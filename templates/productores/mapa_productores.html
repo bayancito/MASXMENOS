@@ -8,43 +8,64 @@ Mapa de Productores
 {% block content %}
 
 <h1 class="mb-4">
-    Mapa de productores
+    Mapa de Productores
 </h1>
 
-<div id="mapa-productores"></div>
+<div
+    id="mapa-productores"
+    style="height:600px;width:100%;"
+></div>
 
-<div id="productores-markers" class="d-none" aria-hidden="true">
+<div id="datos-productores" style="display:none;">
+
     {% for productor in productores %}
-    {% if productor.latitud and productor.longitud %}
-    <span
-        class="map-marker-data"
-        data-lat="{% localize off %}{{ productor.latitud }}{% endlocalize %}"
-        data-lng="{% localize off %}{{ productor.longitud }}{% endlocalize %}"
-        data-nombre="{{ productor.nombre_comercial|escape }}"
-    ></span>
-    {% endif %}
+
+        {% if productor.latitud and productor.longitud %}
+
+        <span
+            data-lat="{% localize off %}{{ productor.latitud }}{% endlocalize %}"
+            data-lng="{% localize off %}{{ productor.longitud }}{% endlocalize %}"
+            data-nombre="{{ productor.nombre_comercial }}"
+        ></span>
+
+        {% endif %}
+
     {% endfor %}
+
 </div>
 
 <script>
+
+document.addEventListener('DOMContentLoaded', function () {
+
     var mapa = L.map('mapa-productores').setView(
         [-17.3935, -66.1570],
         11
     );
 
     L.tileLayer(
-        'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+        {
+            maxZoom: 19
+        }
     ).addTo(mapa);
 
-    document.querySelectorAll('.map-marker-data').forEach(function (el) {
-        var lat = parseFloat(el.dataset.lat);
-        var lng = parseFloat(el.dataset.lng);
-        var nombre = el.dataset.nombre;
+    document
+        .querySelectorAll('#datos-productores span')
+        .forEach(function(item){
 
-        L.marker([lat, lng])
-            .addTo(mapa)
-            .bindPopup('<b>' + nombre + '</b>');
-    });
+            var lat = parseFloat(item.dataset.lat);
+            var lng = parseFloat(item.dataset.lng);
+            var nombre = item.dataset.nombre;
+
+            L.marker([lat, lng])
+                .addTo(mapa)
+                .bindPopup(nombre);
+
+        });
+
+});
+
 </script>
 
 {% endblock %}
