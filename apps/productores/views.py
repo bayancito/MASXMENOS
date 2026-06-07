@@ -128,3 +128,18 @@ def eliminar_productor(request, pk):
             'productor': productor
         }
     )
+
+
+def mapa_productores(request):
+
+    productores = Productor.objects.filter(
+        activo=True
+    )
+
+    return render(
+        request,
+        'productores/mapa_productores.html',
+        {
+            'productores': productores
+        }
+    )

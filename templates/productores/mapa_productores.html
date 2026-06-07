@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load l10n %}
+
+{% block title %}
+Mapa de Productores
+{% endblock %}
+
+{% block content %}
+
+<h1 class="mb-4">
+    Mapa de productores
+</h1>
+
+<div id="mapa-productores"></div>
+
+<div id="productores-markers" class="d-none" aria-hidden="true">
+    {% for productor in productores %}
+    {% if productor.latitud and productor.longitud %}
+    <span
+        class="map-marker-data"
+        data-lat="{% localize off %}{{ productor.latitud }}{% endlocalize %}"
+        data-lng="{% localize off %}{{ productor.longitud }}{% endlocalize %}"
+        data-nombre="{{ productor.nombre_comercial|escape }}"
+    ></span>
+    {% endif %}
+    {% endfor %}
+</div>
+
+<script>
+    var mapa = L.map('mapa-productores').setView(
+        [-17.3935, -66.1570],
+        11
+    );
+
+    L.tileLayer(
+        'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+    ).addTo(mapa);
+
+    document.querySelectorAll('.map-marker-data').forEach(function (el) {
+        var lat = parseFloat(el.dataset.lat);
+        var lng = parseFloat(el.dataset.lng);
+        var nombre = el.dataset.nombre;
+
+        L.marker([lat, lng])
+            .addTo(mapa)
+            .bindPopup('<b>' + nombre + '</b>');
+    });
+</script>
+
+{% endblock %}

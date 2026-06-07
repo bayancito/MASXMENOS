@@ -92,6 +92,18 @@ body.mxm-body {
     color: var(--bs-success);
 }
 
+#mapa-productor {
+    height: 400px;
+    width: 100%;
+    border-radius: 10px;
+}
+
+#mapa-productores {
+    height: 600px;
+    width: 100%;
+    border-radius: 12px;
+}
+
 @media (min-width: 576px) {
     .mxm-catalog-card-img {
         height: 200px;

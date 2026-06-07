@@ -5,7 +5,8 @@ from .views import (
     detalle_productor,
     crear_productor,
     editar_productor,
-    eliminar_productor
+    eliminar_productor,
+    mapa_productores
 )
 
 urlpatterns = [
@@ -38,5 +39,9 @@ urlpatterns = [
     eliminar_productor,
     name='eliminar_productor'
     ),
-
+    path(
+        'mapa/',
+        mapa_productores,
+        name='mapa_productores'
+    ),
 ]

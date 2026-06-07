@@ -17,6 +17,8 @@
         rel="stylesheet"
     >
     <link rel="stylesheet" href="{% static 'css/masxmenos.css' %}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </head>
 
 <body class="mxm-body">
@@ -65,10 +67,18 @@
 
                     <li class="nav-item">
                         <a
-                            class="nav-link{% if 'productores' in request.path %} active{% endif %}"
+                            class="nav-link{% if 'productores' in request.path and request.resolver_match.url_name != 'mapa_productores' %} active{% endif %}"
                             href="{% url 'lista_productores' %}"
                         >
                             Productores
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a
+                            class="nav-link{% if request.resolver_match.url_name == 'mapa_productores' %} active{% endif %}"
+                            href="{% url 'mapa_productores' %}"
+                        >
+                            Mapa de Productores
                         </a>
                     </li>
 
