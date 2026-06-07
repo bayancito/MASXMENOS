@@ -1,4 +1,5 @@
-from django.db.models import Count
+from django.db.models import Count, Q
+from django.core.paginator import Paginator
 from django.shortcuts import (
     render,
     get_object_or_404,
@@ -11,8 +12,50 @@ from .forms import ProductorForm
 
 def lista_productores(request):
 
+    busqueda = request.GET.get(
+        'q',
+        ''
+    )
+
+    municipio = request.GET.get(
+        'municipio',
+        ''
+    )
+
     productores = Productor.objects.annotate(
         num_productos=Count('productos')
+    )
+
+    if busqueda:
+
+        productores = productores.filter(
+            Q(nombre_comercial__icontains=busqueda)
+            | Q(municipio__icontains=busqueda)
+            | Q(telefono__icontains=busqueda)
+        )
+
+    if municipio:
+
+        productores = productores.filter(
+            municipio=municipio
+        )
+
+    municipios = Productor.objects.order_by(
+        'municipio'
+    ).values_list(
+        'municipio',
+        flat=True
+    ).distinct()
+
+    paginator = Paginator(
+        productores,
+        10
+    )
+
+    page_number = request.GET.get('page')
+
+    productores = paginator.get_page(
+        page_number
     )
 
     return render(
@@ -20,6 +63,9 @@ def lista_productores(request):
         'productores/lista_productores.html',
         {
             'productores': productores,
+            'busqueda': busqueda,
+            'municipios': municipios,
+            'municipio_seleccionado': municipio,
         }
     )
 

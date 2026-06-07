@@ -6,26 +6,63 @@ Productores — MASXMENOS
 
 {% block content %}
 
-<header class="mxm-page-title">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-
-        <div>
-            <h1>Productores registrados</h1>
-            <p class="text-muted">
-                Listado de productores rurales vinculados al marketplace.
-            </p>
-        </div>
-    
-        <a
-            href="{% url 'crear_productor' %}"
-            class="btn btn-success"
-        >
-            + Nuevo productor
-
+<header class="mxm-page-title d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3">
+    <div>
+        <h1 class="h3 mb-1">Productores registrados</h1>
+        <p class="text-secondary small mb-0">
+            Búsqueda, filtrado y listado de productores.
+        </p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a href="{% url 'mapa_productores' %}" class="btn btn-outline-success btn-sm">
+            Ver mapa
         </a>
-    
+        <a href="{% url 'crear_productor' %}" class="btn btn-success btn-sm">
+            Nuevo productor
+        </a>
     </div>
 </header>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label for="busqueda" class="form-label">Buscar</label>
+                    <input
+                        type="text"
+                        id="busqueda"
+                        name="q"
+                        value="{{ busqueda }}"
+                        class="form-control"
+                        placeholder="Nombre, comunidad o teléfono"
+                    >
+                </div>
+                <div class="col-md-4">
+                    <label for="municipio" class="form-label">Comunidad</label>
+                    <select id="municipio" name="municipio" class="form-select">
+                        <option value="">Todas las comunidades</option>
+                        {% for item in municipios %}
+                        <option
+                            value="{{ item }}"
+                            {% if item == municipio_seleccionado %}
+                            selected
+                            {% endif %}
+                        >
+                            {{ item }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-success w-100">
+                        Aplicar
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 
 <div class="table-responsive">
     <table class="table table-striped table-bordered align-middle mb-0">
@@ -61,16 +98,12 @@ Productores — MASXMENOS
                         class="btn btn-sm btn-outline-primary"
                     >
                         Editar
-                        <i class="bi bi-pencil"></i>
                     </a>
                     <a
                         href="{% url 'eliminar_productor' productor.pk %}"
                         class="btn btn-sm btn-outline-danger"
                     >
                         Eliminar
-                        <i class="bi bi-trash"></i>
-
-
                     </a>
                 </td>
             </tr>
@@ -89,5 +122,39 @@ Productores — MASXMENOS
 
     </table>
 </div>
+
+<nav class="mt-4" aria-label="Paginación de productores">
+    <ul class="pagination pagination-sm justify-content-center mb-0">
+
+        {% if productores.has_previous %}
+        <li class="page-item">
+            <a
+                class="page-link"
+                href="?page={{ productores.previous_page_number }}{% if busqueda %}&amp;q={{ busqueda|urlencode }}{% endif %}{% if municipio_seleccionado %}&amp;municipio={{ municipio_seleccionado|urlencode }}{% endif %}"
+            >
+                Anterior
+            </a>
+        </li>
+        {% endif %}
+
+        <li class="page-item active" aria-current="page">
+            <span class="page-link">
+                {{ productores.number }}
+            </span>
+        </li>
+
+        {% if productores.has_next %}
+        <li class="page-item">
+            <a
+                class="page-link"
+                href="?page={{ productores.next_page_number }}{% if busqueda %}&amp;q={{ busqueda|urlencode }}{% endif %}{% if municipio_seleccionado %}&amp;municipio={{ municipio_seleccionado|urlencode }}{% endif %}"
+            >
+                Siguiente
+            </a>
+        </li>
+        {% endif %}
+
+    </ul>
+</nav>
 
 {% endblock %}
