@@ -8,7 +8,7 @@ Inicio — MASXMENOS
 
 <header class="mxm-intro pb-4 mb-4 border-bottom">
     <p class="text-success text-uppercase small fw-semibold mb-2 mb-md-3">
-        Panel principal
+        Panel de control
     </p>
     <h1 class="display-6 fw-semibold mb-2">
         MASXMENOS
@@ -21,7 +21,7 @@ Inicio — MASXMENOS
 
 <section class="mb-5" aria-labelledby="estadisticas-titulo">
     <h2 id="estadisticas-titulo" class="h5 text-secondary mb-3">
-        Estadísticas
+        Estadísticas generales
     </h2>
     <div class="row g-3">
         <div class="col-sm-4">
@@ -38,7 +38,7 @@ Inicio — MASXMENOS
                     </p>
                 </div>
             </div>
-        </div> 
+        </div>
         <div class="col-sm-4">
             <div class="card text-center h-100 border-success border-opacity-25">
                 <div class="card-body py-4">
@@ -66,6 +66,116 @@ Inicio — MASXMENOS
                     <p class="card-text small text-secondary mb-0">
                         Clasificaciones del marketplace.
                     </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="mb-5" aria-labelledby="activos-titulo">
+    <h2 id="activos-titulo" class="h5 text-secondary mb-3">
+        Registros activos
+    </h2>
+    <div class="row g-3">
+        <div class="col-sm-6">
+            <div class="card text-center h-100 border-success border-opacity-25">
+                <div class="card-body py-4">
+                    <p class="display-6 fw-semibold text-success mb-1">
+                        {{ productos_activos }}
+                    </p>
+                    <p class="card-title h6 mb-1">
+                        Productos activos
+                    </p>
+                    <p class="card-text small text-secondary mb-0">
+                        Publicados y disponibles en el catálogo.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="card text-center h-100 border-success border-opacity-25">
+                <div class="card-body py-4">
+                    <p class="display-6 fw-semibold text-success mb-1">
+                        {{ productores_activos }}
+                    </p>
+                    <p class="card-title h6 mb-1">
+                        Productores activos
+                    </p>
+                    <p class="card-text small text-secondary mb-0">
+                        Productores habilitados en la plataforma.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="mb-5" aria-labelledby="ultimos-titulo">
+    <h2 id="ultimos-titulo" class="h5 text-secondary mb-3">
+        Últimos registros
+    </h2>
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-light">
+                    <h3 class="h6 mb-0">Últimos productos</h3>
+                </div>
+                {% if ultimos_productos %}
+                <ul class="list-group list-group-flush">
+                    {% for producto in ultimos_productos %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <a href="{% url 'detalle_producto' producto.id %}">
+                            {{ producto.nombre }}
+                        </a>
+                        {% if producto.activo %}
+                        <span class="badge text-bg-success">Activo</span>
+                        {% else %}
+                        <span class="badge text-bg-secondary">Inactivo</span>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="card-body text-secondary small">
+                    No hay productos registrados.
+                </div>
+                {% endif %}
+                <div class="card-footer bg-transparent">
+                    <a href="{% url 'lista_productos' %}" class="btn btn-sm btn-outline-success">
+                        Ver todos los productos
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-light">
+                    <h3 class="h6 mb-0">Últimos productores</h3>
+                </div>
+                {% if ultimos_productores %}
+                <ul class="list-group list-group-flush">
+                    {% for productor in ultimos_productores %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <a href="{% url 'detalle_productor' productor.id %}">
+                            {{ productor.nombre_comercial }}
+                        </a>
+                        {% if productor.activo %}
+                        <span class="badge text-bg-success">Activo</span>
+                        {% else %}
+                        <span class="badge text-bg-secondary">Inactivo</span>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="card-body text-secondary small">
+                    No hay productores registrados.
+                </div>
+                {% endif %}
+                <div class="card-footer bg-transparent">
+                    <a href="{% url 'lista_productores' %}" class="btn btn-sm btn-outline-success">
+                        Ver todos los productores
+                    </a>
                 </div>
             </div>
         </div>
@@ -117,59 +227,6 @@ Inicio — MASXMENOS
             </div>
         </div>
     </div>
-</section>
-<!--
-<section aria-labelledby="pilares-titulo">
-    <h2 id="pilares-titulo" class="h5 text-secondary mb-3">
-        Líneas de trabajo
-    </h2>
-    <div class="row g-4">
-        <div class="col-md-4">
-            <div class="card h-100">
-                <div class="card-header bg-light border-bottom">
-                    <h3 class="h6 mb-0 text-success">
-                        Productores locales
-                    </h3>
-                </div>
-                <div class="card-body">
-                    <p class="card-text small text-secondary mb-0">
-                        Prioriza a pequeños productores rurales de Cochabamba,
-                        visibilizando su oferta en canales digitales.
-                    </p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card h-100">
-                <div class="card-header bg-light border-bottom">
-                    <h3 class="h6 mb-0 text-success">
-                        Comercio justo
-                    </h3>
-                </div>
-                <div class="card-body">
-                    <p class="card-text small text-secondary mb-0">
-                        Relaciones más equitativas entre quien produce
-                        y quien compra en la cadena agrícola.
-                    </p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card h-100">
-                <div class="card-header bg-light border-bottom">
-                    <h3 class="h6 mb-0 text-success">
-                        Tecnología para el campo
-                    </h3>
-                </div>
-                <div class="card-body">
-                    <p class="card-text small text-secondary mb-0">
-                        Herramientas web para registro, búsqueda
-                        y administración de productos agrícolas.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>-->
 </section>
 
 {% endblock %}

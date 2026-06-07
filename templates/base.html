@@ -82,6 +82,15 @@
                         </a>
                     </li>
 
+                    <li class="nav-item">
+                        <a
+                            class="nav-link{% if 'reportes' in request.path %} active{% endif %}"
+                            href="{% url 'reportes' %}"
+                        >
+                            Reportes
+                        </a>
+                    </li>
+
                 </ul>
 
                 <div class="d-flex align-items-center gap-3">
@@ -131,6 +140,8 @@
                 <a href="{% url 'lista_productos' %}">Productos</a>
                 <span class="text-muted mx-1">·</span>
                 <a href="{% url 'lista_productores' %}">Productores</a>
+                <span class="text-muted mx-1">·</span>
+                <a href="{% url 'reportes' %}">Reportes</a>
                 <span class="text-muted mx-1">·</span>
                 <span class="text-muted">&copy; {% now "Y" %}</span>
             </span>
