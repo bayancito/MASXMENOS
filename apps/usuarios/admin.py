@@ -4,11 +4,13 @@ from .models import Perfil
 
 @admin.register(Perfil)
 class PerfilAdmin(admin.ModelAdmin):
+
     list_display = (
         "id",
         "user",
         "rol",
         "telefono",
+        "zona",
         "fecha_registro",
     )
 
@@ -19,4 +21,6 @@ class PerfilAdmin(admin.ModelAdmin):
     search_fields = (
         "user__username",
         "user__email",
+        "telefono",
+        "zona",
     )

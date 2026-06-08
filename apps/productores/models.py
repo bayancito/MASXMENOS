@@ -7,6 +7,8 @@ class Productor(models.Model):
     usuario = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
+        null=True,
+        blank=True,
         related_name='productor'
     )
 

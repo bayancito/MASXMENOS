@@ -126,6 +126,13 @@
                             {{ user.username }}
                         </span>
 
+                        <a
+                            href="{% url 'perfil' %}"
+                            class="btn btn-outline-light btn-sm text-decoration-none"
+                        >
+                            Mi perfil
+                        </a>
+
                         <form
                             method="post"
                             action="{% url 'logout' %}"

@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Mi perfil — MASXMENOS
+{% endblock %}
+
+{% block content %}
+<header class="mxm-page-title">
+    <h1 class="h3 mb-1">
+        Mi perfil
+    </h1>
+    <p class="text-secondary small mb-0">
+        Datos de tu cuenta y tu información personal.
+    </p>
+</header>
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8">
+
+        <div class="card shadow-sm border-success border-opacity-25">
+            <div class="card-body">
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-secondary">
+                            Usuario
+                        </label>
+                        <div class="form-control-plaintext fw-semibold">
+                            {{ user.username }}
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label text-secondary">
+                            Email
+                        </label>
+                        <div class="form-control-plaintext fw-semibold">
+                            {{ user.email }}
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label text-secondary">
+                            Rol
+                        </label>
+                        <div class="form-control-plaintext fw-semibold">
+                            {{ perfil.rol }}
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-secondary">
+                                Teléfono
+                            </label>
+                            {{ form.telefono }}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label text-secondary">
+                                Zona
+                            </label>
+                            {{ form.zona }}
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label text-secondary">
+                                Foto de perfil
+                            </label>
+
+                            {% if perfil.foto_perfil %}
+                                <div class="mb-2">
+                                    <img
+                                        src="{{ perfil.foto_perfil.url }}"
+                                        width="80"
+                                        height="80"
+                                        class="rounded border"
+                                        alt="Foto de perfil"
+                                    >
+                                </div>
+                            {% else %}
+                                <div class="mb-2">
+                                    <img
+                                        src="/static/img/producto-default.png"
+                                        width="80"
+                                        height="80"
+                                        class="rounded border"
+                                        alt="Foto de perfil"
+                                    >
+                                </div>
+                            {% endif %}
+
+                            {{ form.foto_perfil }}
+                        </div>
+                    </div>
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                {% for field, errors in form.errors.items %}
+                                    <li>
+                                        <strong>{{ field }}:</strong> {{ errors|striptags }}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-success">
+                            Guardar cambios
+                        </button>
+
+                        <a href="{% url 'inicio' %}" class="btn btn-outline-secondary">
+                            Volver
+                        </a>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

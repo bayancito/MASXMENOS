@@ -30,6 +30,17 @@ class Perfil(models.Model):
         max_length=20,
         blank=True
     )
+     
+    zona = models.CharField(
+        max_length=100,
+        blank=True
+    )
+
+    foto_perfil = models.ImageField(
+        upload_to='perfiles/',
+        blank=True,
+        null=True
+    )
 
     fecha_registro = models.DateTimeField(
         auto_now_add=True
