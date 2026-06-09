@@ -5,8 +5,10 @@ from .views import (
     lista_productos,
     detalle_producto,
     editar_producto,
-    eliminar_producto
+    eliminar_producto,
+    solicitar_producto,
 )
+
 
 from .urls_favoritos import urlpatterns as favoritos_urls
 
@@ -36,9 +38,16 @@ urlpatterns = favoritos_urls + [
     ),
 
     path(
-    '<int:pk>/eliminar/',
-    eliminar_producto,
-    name='eliminar_producto'
+        '<int:pk>/eliminar/',
+        eliminar_producto,
+        name='eliminar_producto'
     ),
+
+    path(
+        '<int:pk>/solicitar/',
+        solicitar_producto,
+        name='solicitar_producto'
+    ),
+
 
 ]

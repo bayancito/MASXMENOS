@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Mis solicitudes — MASXMENOS{% endblock %}
+
+{% block content %}
+
+<div class="d-flex align-items-center justify-content-between mb-4">
+  <h2 class="h4 mb-0">Mis solicitudes</h2>
+</div>
+
+<div class="card">
+  <div class="card-body">
+
+    {% if solicitudes %}
+
+      <div class="table-responsive">
+        <table class="table table-striped table-bordered align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Producto</th>
+              <th style="width: 140px;">Cantidad</th>
+              <th style="width: 160px;">Estado</th>
+              <th style="width: 200px;">Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for solicitud in solicitudes %}
+              <tr>
+                <td>
+                  <a href="{% url 'detalle_producto' solicitud.producto.id %}">
+                    {{ solicitud.producto.nombre }}
+                  </a>
+                </td>
+                <td>{{ solicitud.cantidad }}</td>
+                <td>
+                  {% if solicitud.estado == 'PENDIENTE' %}
+                    <span class="badge text-bg-warning">PENDIENTE</span>
+                  {% elif solicitud.estado == 'ACEPTADA' %}
+                    <span class="badge text-bg-success">ACEPTADA</span>
+                  {% elif solicitud.estado == 'RECHAZADA' %}
+                    <span class="badge text-bg-danger">RECHAZADA</span>
+                  {% else %}
+                    <span class="badge text-bg-secondary">{{ solicitud.estado }}</span>
+                  {% endif %}
+                </td>
+                <td>{{ solicitud.fecha_creacion|date:"Y-m-d H:i" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+    {% else %}
+      <div class="alert alert-light border text-secondary mb-0">
+        No tienes solicitudes todavía.
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+
+{% endblock %}
+

@@ -82,7 +82,47 @@ class Producto(models.Model):
         return self.nombre
 
 
+class Solicitud(models.Model):
+
+    comprador = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='solicitudes',
+    )
+
+    producto = models.ForeignKey(
+        'Producto',
+        on_delete=models.CASCADE,
+        related_name='solicitudes',
+    )
+
+    cantidad = models.PositiveIntegerField()
+    mensaje = models.TextField(blank=True)
+
+    PENDIENTE = "PENDIENTE"
+    ACEPTADA = "ACEPTADA"
+    RECHAZADA = "RECHAZADA"
+
+    ESTADOS = [
+        (PENDIENTE, "Pendiente"),
+        (ACEPTADA, "Aceptada"),
+        (RECHAZADA, "Rechazada"),
+    ]
+
+    estado = models.CharField(
+        max_length=20,
+        choices=ESTADOS,
+        default=PENDIENTE,
+    )
+
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Solicitud({self.id}) — {self.comprador.username} — {self.producto.nombre}"
+
+
 class Favorito(models.Model):
+
 
     usuario = models.ForeignKey(
         User,

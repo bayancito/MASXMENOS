@@ -94,8 +94,14 @@ def detalle_productor(request, pk):
     )
 
 
+from apps.usuarios.decorators import es_productor_o_admin
+
+
 @es_productor_o_admin
 def crear_productor(request):
+
+
+
 
     if request.method == 'POST':
 
@@ -121,7 +127,9 @@ def crear_productor(request):
         }
     )
 
+@es_productor_o_admin
 def editar_productor(request, pk):
+
 
     productor = get_object_or_404(
         Productor,

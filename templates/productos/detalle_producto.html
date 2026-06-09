@@ -107,11 +107,18 @@
     <br>
     {% endif %}
 
-    {% if user.is_authenticated and user.perfil.rol != 'COMPRADOR' %}
+    {% if user.is_authenticated and user.perfil.rol == 'COMPRADOR' %}
+
+    <a href="{% url 'solicitar_producto' producto.id %}" class="btn btn-success">
+        Solicitar producto
+    </a>
+
+    {% else %}
+
 
     <a
+        href="{% url 'editar_producto' producto.id %}"
 
-    href="{% url 'editar_producto' producto.id %}"
     class="btn btn-warning">
 
     Editar

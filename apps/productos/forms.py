@@ -1,11 +1,11 @@
 from django import forms
-from .models import Producto
+
+from .models import Producto, Solicitud
 
 
 class ProductoForm(forms.ModelForm):
 
     class Meta:
-
         model = Producto
 
         fields = [
@@ -17,7 +17,6 @@ class ProductoForm(forms.ModelForm):
         ]
 
         widgets = {
-
             'nombre': forms.TextInput(
                 attrs={'class': 'form-control'}
             ),
@@ -35,3 +34,23 @@ class ProductoForm(forms.ModelForm):
             ),
 
         }
+
+
+class SolicitudForm(forms.ModelForm):
+
+    class Meta:
+        model = Solicitud
+        fields = [
+            'cantidad',
+            'mensaje',
+        ]
+
+        widgets = {
+            'cantidad': forms.NumberInput(
+                attrs={'class': 'form-control', 'min': 1}
+            ),
+            'mensaje': forms.Textarea(
+                attrs={'class': 'form-control', 'rows': 4}
+            ),
+        }
+

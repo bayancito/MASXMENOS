@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Solicitar — {{ producto.nombre }}
+{% endblock %}
+
+{% block content %}
+
+<div class="card mx-auto" style="max-width: 720px;">
+    <div class="card-body">
+        <h2 class="h4 mb-3">Solicitar producto</h2>
+
+        <div class="mb-4">
+            <div class="text-secondary small">Producto</div>
+            <div class="fw-semibold">{{ producto.nombre }}</div>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                {{ form.cantidad.label_tag }}
+                {{ form.cantidad }}
+                {% if form.cantidad.errors %}
+                    <div class="text-danger small mt-1">{{ form.cantidad.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                {{ form.mensaje.label_tag }}
+                {{ form.mensaje }}
+                {% if form.mensaje.errors %}
+                    <div class="text-danger small mt-1">{{ form.mensaje.errors }}</div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-success">
+                Enviar solicitud
+            </button>
+
+            <a href="{% url 'detalle_producto' producto.id %}" class="btn btn-outline-secondary ms-2">
+                Cancelar
+            </a>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+

@@ -22,6 +22,16 @@ urlpatterns = [
     ),
 
     path(
+        'productos/solicitudes/',
+        include('apps.productos.urls_solicitudes')
+    ),
+
+    path(
+        'productos/solicitudes-recibidas/',
+        include('apps.productos.urls_recibidas')
+    ),
+
+    path(
         'productores/',
         include('apps.productores.urls')
     ),

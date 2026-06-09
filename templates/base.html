@@ -134,6 +134,23 @@
                             Mi perfil
                         </a>
 
+                        {% if user.is_authenticated and user.perfil.rol == "PRODUCTOR" %}
+                            <a
+                                href="{% url 'solicitudes_recibidas' %}"
+                                class="btn btn-outline-light btn-sm text-decoration-none"
+                            >
+                                Solicitudes recibidas
+                            </a>
+                        {% else %}
+                            <a
+                                href="{% url 'mis_solicitudes' %}"
+                                class="btn btn-outline-light btn-sm text-decoration-none"
+                            >
+                                Mis solicitudes
+                            </a>
+                        {% endif %}
+
+
                         <a
                             href="{% url 'mis_favoritos' %}"
                             class="btn btn-outline-light btn-sm text-decoration-none"
