@@ -17,9 +17,12 @@ Productores — MASXMENOS
         <a href="{% url 'mapa_productores' %}" class="btn btn-outline-success btn-sm">
             Ver mapa
         </a>
-        <a href="{% url 'crear_productor' %}" class="btn btn-success btn-sm">
-            Nuevo productor
-        </a>
+        {% if user.is_authenticated and user.perfil.rol != 'COMPRADOR' %}
+            <a href="{% url 'crear_productor' %}" class="btn btn-success btn-sm">
+                Nuevo productor
+            </a>
+        {% endif %}
+
     </div>
 </header>
 

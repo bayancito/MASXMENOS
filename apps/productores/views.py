@@ -9,6 +9,12 @@ from django.shortcuts import (
 from .models import Productor
 from .forms import ProductorForm
 
+from apps.usuarios.decorators import es_productor_o_admin
+
+
+
+
+
 
 def lista_productores(request):
 
@@ -88,6 +94,7 @@ def detalle_productor(request, pk):
     )
 
 
+@es_productor_o_admin
 def crear_productor(request):
 
     if request.method == 'POST':
@@ -120,6 +127,12 @@ def editar_productor(request, pk):
         Productor,
         pk=pk
     )
+
+    rol = request.user.perfil.rol
+
+    if rol != "ADMIN" and productor.usuario != request.user:
+        return redirect("lista_productores")
+
 
     if request.method == 'POST':
 
@@ -158,6 +171,12 @@ def eliminar_productor(request, pk):
         Productor,
         pk=pk
     )
+
+    rol = request.user.perfil.rol
+
+    if rol != "ADMIN" and productor.usuario != request.user:
+        return redirect("lista_productores")
+
 
     if request.method == 'POST':
 

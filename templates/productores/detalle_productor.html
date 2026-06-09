@@ -21,6 +21,8 @@
 
 <div class="d-flex gap-2">
 
+    {% if user.is_authenticated and user.perfil.rol != 'COMPRADOR' %}
+
     <a
         href="{% url 'editar_productor' productor.id %}"
         class="btn btn-warning btn-sm"
@@ -34,6 +36,10 @@
     >
         Eliminar
     </a>
+
+    {% endif %}
+
+
 
     <a
         href="{% url 'lista_productores' %}"

@@ -14,9 +14,12 @@ Productos — MASXMENOS
             Búsqueda, filtrado y listado del catálogo.
         </p>
     </div>
-    <a href="{% url 'crear_producto' %}" class="btn btn-success btn-sm">
-        Nuevo producto
-    </a>
+    {% if user.is_authenticated and user.perfil.rol != 'COMPRADOR' %}
+        <a href="{% url 'crear_producto' %}" class="btn btn-success btn-sm">
+            Nuevo producto
+        </a>
+    {% endif %}
+
 </header>
 
 <div class="card mb-4">

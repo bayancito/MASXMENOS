@@ -1,14 +1,17 @@
 from django.shortcuts import render, redirect, get_object_or_404
 
-from .forms import ProductoForm
-from .models import Producto
+from apps.usuarios.decorators import es_productor_o_admin
+
 from .forms import ProductoForm
 from .models import Producto, Categoria
+
 from django.core.paginator import Paginator
+
+@es_productor_o_admin
 def crear_producto(request):
 
-    if request.method == 'POST':
 
+    if request.method == 'POST':
         form = ProductoForm(
             request.POST,
             request.FILES
@@ -16,7 +19,12 @@ def crear_producto(request):
 
         if form.is_valid():
 
-            form.save()
+            producto = form.save(commit=False)
+
+            if hasattr(request.user, 'productor'):
+                producto.productor = request.user.productor
+
+            producto.save()
 
             return redirect('/')
 
@@ -102,8 +110,14 @@ def editar_producto(request, pk):
         pk=pk
     )
 
-    if request.method == 'POST':
+    if request.user.is_authenticated and hasattr(request.user, "perfil"):
+        rol = request.user.perfil.rol
+        if rol != "ADMIN":
+            # Permitir solo si el productor del producto pertenece al usuario logueado
+            if not (hasattr(producto, "productor") and producto.productor.usuario == request.user):
+                return redirect("lista_productos")
 
+    if request.method == 'POST':
         form = ProductoForm(
             request.POST,
             request.FILES,
@@ -134,12 +148,20 @@ def editar_producto(request, pk):
         }
     )
 
+@es_productor_o_admin
 def eliminar_producto(request, pk):
 
     producto = get_object_or_404(
         Producto,
         pk=pk
     )
+
+    if request.user.is_authenticated and hasattr(request.user, "perfil"):
+        rol = request.user.perfil.rol
+        if rol != "ADMIN":
+            if not (hasattr(producto, "productor") and producto.productor.usuario == request.user):
+                return redirect("lista_productos")
+
 
     if request.method == 'POST':
 
