@@ -1,5 +1,7 @@
 from django.db import models
 from apps.productores.models import Productor
+from django.contrib.auth.models import User
+
 
 class Categoria(models.Model):
 
@@ -28,7 +30,7 @@ class Categoria(models.Model):
 
     def __str__(self):
         return self.nombre
-    
+
 
 class Producto(models.Model):
 
@@ -40,22 +42,22 @@ class Producto(models.Model):
         blank=True,
         null=True
     )
-    
+
     categoria = models.ForeignKey(
-    Categoria,
-    on_delete=models.PROTECT,
-    related_name='productos',
-    null=True,
-    blank=True
+        Categoria,
+        on_delete=models.PROTECT,
+        related_name='productos',
+        null=True,
+        blank=True
     )
-    
+
     productor = models.ForeignKey(
-    Productor,
-    on_delete=models.CASCADE,
-    related_name='productos',
-    null=True,
-    blank=True
-)
+        Productor,
+        on_delete=models.CASCADE,
+        related_name='productos',
+        null=True,
+        blank=True
+    )
 
     imagen = models.ImageField(
         upload_to='productos/',
@@ -78,3 +80,30 @@ class Producto(models.Model):
 
     def __str__(self):
         return self.nombre
+
+
+class Favorito(models.Model):
+
+    usuario = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='favoritos'
+    )
+
+    producto = models.ForeignKey(
+        Producto,
+        on_delete=models.CASCADE,
+        related_name='favoritos'
+    )
+
+    fecha_creacion = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    class Meta:
+        unique_together = ("usuario", "producto")
+        verbose_name = "Favorito"
+        verbose_name_plural = "Favoritos"
+
+    def __str__(self):
+        return f"{self.usuario.username} - {self.producto.nombre}"

@@ -122,6 +122,7 @@
 
                     {% if user.is_authenticated %}
 
+
                         <span class="navbar-text small py-0">
                             {{ user.username }}
                         </span>
@@ -131,6 +132,13 @@
                             class="btn btn-outline-light btn-sm text-decoration-none"
                         >
                             Mi perfil
+                        </a>
+
+                        <a
+                            href="{% url 'mis_favoritos' %}"
+                            class="btn btn-outline-light btn-sm text-decoration-none"
+                        >
+                            Mis favoritos
                         </a>
 
                         <form

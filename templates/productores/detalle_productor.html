@@ -21,32 +21,13 @@
 
 <div class="d-flex gap-2">
 
-    {% if user.is_authenticated and user.perfil.rol != 'COMPRADOR' %}
-
-    <a
-        href="{% url 'editar_productor' productor.id %}"
-        class="btn btn-warning btn-sm"
-    >
-        Editar
-    </a>
-
-    <a
-        href="{% url 'eliminar_productor' productor.id %}"
-        class="btn btn-danger btn-sm"
-    >
-        Eliminar
-    </a>
-
-    {% endif %}
-
-
-
     <a
         href="{% url 'lista_productores' %}"
         class="btn btn-outline-secondary btn-sm"
     >
         Volver
     </a>
+
 
 </div>
 
@@ -58,10 +39,25 @@
     <dl class="row mb-0">
 
         <dt class="col-sm-3 col-md-2 text-secondary">
-            Nombre
+            Nombre comercial
         </dt>
         <dd class="col-sm-9 col-md-10">
             {{ productor.nombre_comercial }}
+        </dd>
+
+        <dt class="col-sm-3 col-md-2 text-secondary">
+            Cantidad de productos
+        </dt>
+        <dd class="col-sm-9 col-md-10">
+            {{ productor.productos.count }}
+        </dd>
+
+
+        <dt class="col-sm-3 col-md-2 text-secondary">
+            Municipio
+        </dt>
+        <dd class="col-sm-9 col-md-10">
+            {{ productor.municipio }}
         </dd>
 
         <dt class="col-sm-3 col-md-2 text-secondary">
@@ -78,21 +74,8 @@
             {{ productor.direccion }}
         </dd>
 
-        <dt class="col-sm-3 col-md-2 text-secondary">
-            Latitud
-        </dt>
-        <dd class="col-sm-9 col-md-10">
-            {{ productor.latitud }}
-        </dd>
-
-        <dt class="col-sm-3 col-md-2 text-secondary">
-            Longitud
-        </dt>
-        <dd class="col-sm-9 col-md-10">
-            {{ productor.longitud }}
-        </dd>
-
     </dl>
+
 
     </div>
 </div>

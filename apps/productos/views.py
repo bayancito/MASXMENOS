@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from apps.usuarios.decorators import es_productor_o_admin
 
 from .forms import ProductoForm
-from .models import Producto, Categoria
+from .models import Producto, Categoria, Favorito
 
 from django.core.paginator import Paginator
 

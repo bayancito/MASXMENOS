@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Mis favoritos — MASXMENOS
+{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">Mis favoritos</h2>
+
+{% if productos %}
+
+<div class="row row-cols-1 row-cols-md-2 g-3">
+
+    {% for producto in productos %}
+
+    <div class="col">
+
+        <div class="card h-100">
+
+            <div class="card-body">
+
+                <h5 class="card-title">
+                    <a href="{% url 'detalle_producto' producto.id %}">
+                        {{ producto.nombre }}
+                    </a>
+                </h5>
+
+                {% if producto.categoria %}
+                <p class="text-secondary mb-1">{{ producto.categoria }}</p>
+                {% endif %}
+
+                <p class="mb-0">
+                    <span class="badge text-bg-{{ producto.activo|yesno:'success,secondary' }}">
+                        {{ producto.activo|yesno:'Activo,Inactivo' }}
+                    </span>
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% else %}
+
+<div class="alert alert-light border text-secondary">
+    Aún no tienes favoritos.
+</div>
+
+{% endif %}
+
+{% endblock %}
+

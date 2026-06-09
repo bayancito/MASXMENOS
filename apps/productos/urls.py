@@ -8,8 +8,9 @@ from .views import (
     eliminar_producto
 )
 
-urlpatterns = [
+from .urls_favoritos import urlpatterns as favoritos_urls
 
+urlpatterns = favoritos_urls + [
     path(
         '',
         lista_productos,
@@ -22,7 +23,7 @@ urlpatterns = [
         name='crear_producto'
     ),
 
-     path(
+    path(
         '<int:pk>/',
         detalle_producto,
         name='detalle_producto'
