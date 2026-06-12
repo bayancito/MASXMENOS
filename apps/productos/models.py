@@ -1,6 +1,7 @@
 from django.db import models
 from apps.productores.models import Productor
 from django.contrib.auth.models import User
+from decimal import Decimal
 
 
 class Categoria(models.Model):
@@ -63,6 +64,13 @@ class Producto(models.Model):
         upload_to='productos/',
         blank=True,
         null=True
+    )
+
+    precio = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=Decimal('0.00'),
+        help_text="Precio en Bs. (moneda local)"
     )
 
     activo = models.BooleanField(

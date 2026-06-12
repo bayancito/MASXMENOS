@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block title %}Mi Panel — Productor{% endblock %}
+
+{% block content %}
+
+<div class="container-xl py-5">
+  <!-- Header -->
+  <div class="d-flex align-items-center justify-content-between mb-5">
+    <div>
+      <h1 class="h3 fw-bold mb-2">Bienvenido, {{ user.first_name|default:user.username }}</h1>
+      <p class="text-secondary mb-0">Dashboard de productor agrícola</p>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="row g-4 mb-5">
+
+    <div class="col-12 col-md-6 col-lg-3">
+      <div class="card h-100 border-primary shadow-sm">
+        <div class="card-body">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h5 class="card-title text-primary mb-0">Productos</h5>
+            <i class="bi bi-box text-primary fs-5"></i>
+          </div>
+          <p class="display-5 fw-bold mb-0">{{ total_productos }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-lg-3">
+      <div class="card h-100 border-warning shadow-sm">
+        <div class="card-body">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h5 class="card-title text-warning mb-0">Pendientes</h5>
+            <i class="bi bi-clock text-warning fs-5"></i>
+          </div>
+          <p class="display-5 fw-bold mb-0">{{ solicitudes_pendientes }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-lg-3">
+      <div class="card h-100 border-success shadow-sm">
+        <div class="card-body">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h5 class="card-title text-success mb-0">Aceptadas</h5>
+            <i class="bi bi-check-circle text-success fs-5"></i>
+          </div>
+          <p class="display-5 fw-bold mb-0">{{ solicitudes_aceptadas }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-lg-3">
+      <div class="card h-100 border-danger shadow-sm">
+        <div class="card-body">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h5 class="card-title text-danger mb-0">Rechazadas</h5>
+            <i class="bi bi-x-circle text-danger fs-5"></i>
+          </div>
+          <p class="display-5 fw-bold mb-0">{{ solicitudes_rechazadas }}</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Accesos Rápidos -->
+  <div class="mb-5">
+    <h3 class="h5 fw-bold mb-3">Accesos Rápidos</h3>
+    <div class="row g-3">
+      <div class="col-12 col-sm-6 col-lg-3">
+        <a href="{% url 'crear_producto' %}" class="btn btn-primary w-100 py-3 fw-semibold">
+          <i class="bi bi-plus-lg me-2"></i>Nuevo Producto
+        </a>
+      </div>
+      <div class="col-12 col-sm-6 col-lg-3">
+        <a href="{% url 'lista_productos' %}" class="btn btn-outline-primary w-100 py-3">
+          <i class="bi bi-box-seam me-2"></i>Mis Productos
+        </a>
+      </div>
+      <div class="col-12 col-sm-6 col-lg-3">
+        <a href="{% url 'solicitudes_recibidas' %}" class="btn btn-outline-success w-100 py-3">
+          <i class="bi bi-inbox me-2"></i>Solicitudes
+        </a>
+      </div>
+      <div class="col-12 col-sm-6 col-lg-3">
+        <a href="{% url 'perfil' %}" class="btn btn-outline-secondary w-100 py-3">
+          <i class="bi bi-person me-2"></i>Mi Perfil
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Últimas Solicitudes -->
+  <div>
+    <h3 class="h5 fw-bold mb-3">Últimas Solicitudes Recibidas</h3>
+    {% if ultimas_solicitudes %}
+      <div class="table-responsive">
+        <table class="table table-hover align-middle border">
+          <thead class="table-light">
+            <tr>
+              <th>Comprador</th>
+              <th>Producto</th>
+              <th class="text-center">Cantidad</th>
+              <th class="text-center">Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for solicitud in ultimas_solicitudes %}
+              <tr>
+                <td class="fw-semibold">{{ solicitud.comprador.username }}</td>
+                <td>
+                  <a href="{% url 'detalle_producto' solicitud.producto.id %}" class="text-decoration-none">
+                    {{ solicitud.producto.nombre }}
+                  </a>
+                </td>
+                <td class="text-center">{{ solicitud.cantidad }}</td>
+                <td class="text-center">
+                  {% if solicitud.estado == 'PENDIENTE' %}
+                    <span class="badge bg-warning">PENDIENTE</span>
+                  {% elif solicitud.estado == 'ACEPTADA' %}
+                    <span class="badge bg-success">ACEPTADA</span>
+                  {% elif solicitud.estado == 'RECHAZADA' %}
+                    <span class="badge bg-danger">RECHAZADA</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="alert alert-light border text-secondary" role="status">
+        <i class="bi bi-info-circle me-2"></i>No hay solicitudes por el momento
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

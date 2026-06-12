@@ -163,6 +163,49 @@ def solicitudes_recibidas(request):
     )
 
 
+def dashboard_productor(request):
+    if not request.user.is_authenticated:
+        return redirect('inicio')
+
+    if not hasattr(request.user, 'perfil') or request.user.perfil.rol != 'PRODUCTOR':
+        return redirect('inicio')
+
+    total_productos = Producto.objects.filter(
+        productor__usuario=request.user
+    ).count()
+
+    solicitudes_pendientes = Solicitud.objects.filter(
+        producto__productor__usuario=request.user,
+        estado=Solicitud.PENDIENTE
+    ).count()
+
+    solicitudes_aceptadas = Solicitud.objects.filter(
+        producto__productor__usuario=request.user,
+        estado=Solicitud.ACEPTADA
+    ).count()
+
+    solicitudes_rechazadas = Solicitud.objects.filter(
+        producto__productor__usuario=request.user,
+        estado=Solicitud.RECHAZADA
+    ).count()
+
+    ultimas_solicitudes = Solicitud.objects.filter(
+        producto__productor__usuario=request.user
+    ).order_by('-fecha_creacion')[:5]
+
+    return render(
+        request,
+        'productos/dashboard_productor.html',
+        {
+            'total_productos': total_productos,
+            'solicitudes_pendientes': solicitudes_pendientes,
+            'solicitudes_aceptadas': solicitudes_aceptadas,
+            'solicitudes_rechazadas': solicitudes_rechazadas,
+            'ultimas_solicitudes': ultimas_solicitudes,
+        }
+    )
+
+
 def aceptar_solicitud(request, pk):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -197,6 +240,43 @@ def rechazar_solicitud(request, pk):
     solicitud.save()
 
     return redirect('solicitudes_recibidas')
+
+
+def dashboard_comprador(request):
+    if not request.user.is_authenticated:
+        return redirect('inicio')
+
+    if not hasattr(request.user, 'perfil') or request.user.perfil.rol != 'COMPRADOR':
+        return redirect('inicio')
+
+    total_favoritos = Favorito.objects.filter(usuario=request.user).count()
+    total_solicitudes = Solicitud.objects.filter(comprador=request.user).count()
+
+    solicitudes_pendientes = Solicitud.objects.filter(
+        comprador=request.user,
+        estado=Solicitud.PENDIENTE
+    ).count()
+
+    solicitudes_aceptadas = Solicitud.objects.filter(
+        comprador=request.user,
+        estado=Solicitud.ACEPTADA
+    ).count()
+
+    ultimas_solicitudes = Solicitud.objects.filter(
+        comprador=request.user
+    ).order_by('-fecha_creacion')[:5]
+
+    return render(
+        request,
+        'usuarios/dashboard_comprador.html',
+        {
+            'total_favoritos': total_favoritos,
+            'total_solicitudes': total_solicitudes,
+            'solicitudes_pendientes': solicitudes_pendientes,
+            'solicitudes_aceptadas': solicitudes_aceptadas,
+            'ultimas_solicitudes': ultimas_solicitudes,
+        }
+    )
 
 
 def solicitar_producto(request, pk):

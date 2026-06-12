@@ -46,13 +46,36 @@ class SolicitudAdmin(admin.ModelAdmin):
 @admin.register(Producto)
 class ProductoAdmin(admin.ModelAdmin):
 
-
     list_display = (
         'nombre',
+        'categoria',
+        'precio',
         'activo',
         'fecha_creacion'
     )
 
     search_fields = (
         'nombre',
+        'descripcion',
+    )
+
+    list_filter = (
+        'activo',
+        'categoria',
+        'fecha_creacion',
+    )
+
+    fieldsets = (
+        ('Información básica', {
+            'fields': ('nombre', 'descripcion', 'categoria')
+        }),
+        ('Precio y disponibilidad', {
+            'fields': ('precio', 'activo')
+        }),
+        ('Multimedia', {
+            'fields': ('imagen',)
+        }),
+        ('Productor', {
+            'fields': ('productor',)
+        }),
     )

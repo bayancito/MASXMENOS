@@ -7,6 +7,7 @@ from .views import (
     editar_producto,
     eliminar_producto,
     solicitar_producto,
+    dashboard_productor,
 )
 
 
@@ -49,5 +50,10 @@ urlpatterns = favoritos_urls + [
         name='solicitar_producto'
     ),
 
+    path(
+        'dashboard/',
+        dashboard_productor,
+        name='dashboard_productor'
+    ),
 
 ]

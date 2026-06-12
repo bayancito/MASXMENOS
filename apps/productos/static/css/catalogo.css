@@ -1,0 +1,108 @@
+/* MASXMENOS — catalogo styles (pendiente; inicialmente vacío por clasificación segura) */
+
+/* =========================================
+   ESTILOS PREMIUM PARA EL CATÁLOGO
+   ========================================= */
+
+/* Efecto de elevación en las tarjetas de producto */
+.custom-hover-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+.custom-hover-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-color: #198754 !important; /* Borde verde sutil al hacer hover */
+}
+
+/* Animación del ícono de flecha en la tarjeta */
+.action-btn {
+    transition: all 0.2s ease;
+}
+
+.custom-hover-card:hover .action-btn {
+    background-color: #198754 !important;
+    color: white !important;
+    transform: translateX(4px);
+}
+
+/* Estilizar los inputs del filtro para que no tengan el borde azul fuerte de Bootstrap */
+.form-control:focus, 
+.form-select:focus {
+    box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.15);
+    border-color: #198754;
+}
+
+/* Ocultar scrollbar si en el futuro agregas muchas regiones/categorías */
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* =========================================
+   REPARACIÓN DE TARJETAS (ANTI-AZUL)
+   ========================================= */
+
+/* 1. Evita que el enlace vuelva todo azul */
+.agro-card-link {
+    text-decoration: none !important;
+    color: inherit !important;
+    display: block;
+    height: 100%;
+}
+
+/* 2. Tarjeta bien marcada con sombra y borde */
+.agro-card {
+    background-color: #ffffff !important;
+    border: 1px solid #EAF1E8 !important; /* Borde verdecito muy claro */
+    border-radius: 1rem !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04) !important; /* Sombra para que resalte del fondo */
+}
+
+.agro-card:hover {
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.08) !important;
+    border-color: #D0E0CC !important;
+    transform: translateY(-4px) !important;
+}
+
+/* 3. Colores exactos del wireframe */
+.agro-price {
+    color: #2F432B !important; /* Verde oscuro del precio, NUNCA AZUL */
+}
+
+.agro-badge-disponible {
+    background-color: #DCFCE7 !important;
+    color: #166534 !important; /* Verde oscuro, NUNCA AZUL */
+    padding: 6px 14px !important;
+    border-radius: 20px !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    border: none !important;
+}
+
+/* 4. Botón circular de "+" */
+.agro-plus-btn {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 50% !important;
+    background-color: #F7F9F6 !important;
+    color: #4A6B42 !important; /* Icono verde, NUNCA AZUL */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: 1px solid #EAF1E8 !important;
+    font-size: 1.2rem !important;
+}
+
+.agro-card:hover .agro-plus-btn {
+    background-color: #4A6B42 !important;
+    color: #ffffff !important;
+}

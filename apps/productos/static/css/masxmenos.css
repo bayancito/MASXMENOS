@@ -1,111 +1,333 @@
-/* MASXMENOS — ajustes mínimos sobre Bootstrap 5 */
+/* ==========================================================================
+   SISTEMA DE DISEÑO ARVA — Marketplace Agrícola
+   ========================================================================== */
 
+/* TEMPORAL: legacy CSS (no eliminar hasta validar). Se mantiene para evitar cambios visuales mientras migramos.
+   Cuando ya esté verificado, se podrá reemplazar por @import o remover selectivamente.
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;500;600&family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+    /* Paleta Arva */
+    --color-forest-ink: #8a9d98;
+    --color-vivid-lime: #e8fe85;
+    --color-bone: #f1efdf;
+    --color-pure-white: #ffffff;
+    --color-ash-gray: #efefef;
+    --color-charcoal: #212529;
+    --color-graphite: #353535;
+    --color-pewter: #6d6d6d;
+    --color-sky-card: #b2cee7;
+    --color-peach-card: #fceace;
+    --color-sage-card: #e6ecd5;
+    --color-moss: #c3cda7;
+
+    /* Fuentes Arva */
+    --font-serif: 'Cormorant Garamond', serif;
+    --font-sans: 'Inter', sans-serif;
+}
+
+/* ==========================================================================
+   BASE Y TIPOGRAFÍA
+   ========================================================================== */
 body.mxm-body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    background-color: var(--color-bone); /* Lienzo hueso impreso */
+    color: var(--color-charcoal);
+    font-family: var(--font-sans);
+    line-height: 1.52;
 }
 
 .mxm-main {
     flex: 1 0 auto;
-    padding-top: 1.5rem;
-    padding-bottom: 3rem;
 }
 
-.mxm-page-title {
-    margin-bottom: 1.75rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--bs-border-color);
+/* Tipografía Editorial */
+h1, h2, h3, h4, h5, h6, .arva-display, .arva-heading {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    color: var(--color-charcoal);
+    letter-spacing: -0.012em;
 }
 
-.mxm-intro {
-    padding: 2.5rem 0 2rem;
-    margin-bottom: 2rem;
-    border-bottom: 1px solid var(--bs-border-color);
+.arva-display {
+    font-size: clamp(45px, 6vw, 80px);
+    font-weight: 300;
+    line-height: 1;
 }
 
-.mxm-product-thumb {
-    width: 56px;
-    height: 56px;
-    object-fit: cover;
-    border-radius: var(--bs-border-radius);
-    border: 1px solid var(--bs-border-color);
+.arva-heading {
+    font-size: clamp(37px, 4vw, 57px);
+    font-weight: 300;
+    line-height: 1.06;
 }
 
-.mxm-thumb-placeholder {
-    width: 56px;
-    height: 56px;
-    border-radius: var(--bs-border-radius);
-    background-color: var(--bs-light);
-    border: 1px solid var(--bs-border-color);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--bs-secondary-color);
-    font-size: 0.875rem;
+.arva-text-charcoal {
+    color: var(--color-charcoal) !important;
 }
 
-.mxm-footer {
-    flex-shrink: 0;
-    margin-top: auto;
-    padding: 1rem 0;
-    font-size: 0.875rem;
-    color: var(--bs-secondary-color);
-    border-top: 1px solid var(--bs-border-color);
-    background-color: var(--bs-light);
-}
-
-.mxm-footer a {
-    color: var(--bs-secondary-color);
-    text-decoration: none;
-}
-
-.mxm-footer a:hover {
-    color: var(--bs-success);
-    text-decoration: underline;
-}
-
-/* Catálogo — vista tarjetas */
-.mxm-catalog-card {
-    border: 1px solid var(--bs-border-color);
-}
-
-.mxm-catalog-card-img {
+/* ==========================================================================
+   NAVEGACIÓN (HEADER Y MARQUEE)
+   ========================================================================== */
+.arva-marquee {
+    background-color: var(--color-vivid-lime);
+    color: var(--color-charcoal);
+    padding: 8px 0;
+    font-size: 13px;
+    font-weight: 600;
+    overflow: hidden;
+    white-space: nowrap;
     width: 100%;
-    height: 180px;
+}
+
+.arva-marquee-track span {
+    margin-right: 40px;
+}
+
+.mxm-header {
+    background: transparent;
+    position: relative;
+    z-index: 10;
+}
+
+.mxm-nav-shell {
+    background: var(--color-forest-ink);
+    border-radius: 110px;
+    padding: 0.8rem 1.5rem;
+    box-shadow: 0 10px 30px rgba(7, 80, 63, 0.15);
+}
+
+.navbar-brand {
+    font-size: 1.4rem;
+    font-family: var(--font-serif);
+    color: var(--color-pure-white) !important;
+    letter-spacing: 0.02em;
+}
+
+.navbar-nav .nav-link {
+    color: var(--color-pure-white) !important;
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.navbar-nav .nav-link.active,
+.navbar-nav .nav-link:hover {
+    opacity: 1;
+}
+
+.mxm-nav-shell .text-secondary {
+    color: var(--color-pure-white) !important;
+    opacity: 0.7;
+}
+
+/* ==========================================================================
+   BOTONES (FORMA DE PÍLDORA ARVA)
+   ========================================================================== */
+.btn {
+    border-radius: 100px !important;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 600;
+    padding: 12px 28px;
+    letter-spacing: 0.025em;
+    box-shadow: none !important;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+}
+
+.btn-sm {
+    padding: 8px 20px;
+    font-size: 12px;
+}
+
+.btn-mxm-primary {
+    background-color: var(--color-pure-white);
+    color: var(--color-forest-ink);
+    border: none;
+}
+
+.btn-mxm-primary:hover {
+    background-color: var(--color-ash-gray);
+    color: var(--color-forest-ink);
+}
+
+.btn-mxm-outline {
+    background-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: var(--color-pure-white);
+}
+
+.btn-mxm-outline:hover {
+    border-color: var(--color-pure-white);
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--color-pure-white);
+}
+
+.arva-btn-forest {
+    background-color: var(--color-forest-ink);
+    color: var(--color-pure-white);
+    border: 1px solid var(--color-forest-ink);
+}
+
+.arva-btn-forest:hover {
+    background-color: #053b2e;
+    color: var(--color-pure-white);
+}
+
+.arva-btn-sky {
+    background-color: var(--color-sky-card);
+    color: var(--color-forest-ink);
+    border: 1px solid var(--color-sky-card);
+}
+
+.arva-btn-sky:hover {
+    background-color: #9cbdd7;
+    color: var(--color-forest-ink);
+}
+
+/* ==========================================================================
+   HERO FULL-BLEED CON VIDEO
+   ========================================================================== */
+.arva-hero {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    margin-top: -120px; /* Sube detrás del header */
+    overflow: hidden;
+    margin-bottom: 80px;
+}
+
+.arva-hero-video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    transform: translate(-50%, -50%);
     object-fit: cover;
+    z-index: 0;
 }
 
-.mxm-catalog-card-placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: var(--bs-light);
-    border-bottom: 1px solid var(--bs-border-color);
+.arva-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(7, 80, 63, 0.4); /* Tinte verde bosque para que el texto blanco resalte */
+    z-index: 1;
 }
 
-.mxm-catalog-card-meta dt {
+.arva-scroll-cue {
+    position: absolute;
+    bottom: 40px;
+    font-size: 13px;
+    letter-spacing: 0.025em;
     font-weight: 500;
 }
 
-.mxm-catalog-card .card-title a:hover {
-    color: var(--bs-success);
+/* ==========================================================================
+   TARJETAS Y SECCIONES
+   ========================================================================== */
+.arva-card {
+    border-radius: 20px;
+    padding: 40px 30px;
+    border: none;
+    box-shadow: none;
 }
 
-#mapa-productor {
-    height: 400px;
-    width: 100%;
-    border-radius: 10px;
+.bg-arva-sky { background-color: var(--color-sky-card); }
+.bg-arva-peach { background-color: var(--color-peach-card); }
+.bg-arva-sage { background-color: var(--color-sage-card); }
+
+.arva-forest-banner {
+    background-color: var(--color-forest-ink);
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
 }
 
-#mapa-productores {
-    height: 600px;
-    width: 100%;
-    border-radius: 12px;
+.arva-icon-circle {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
 }
 
-@media (min-width: 576px) {
-    .mxm-catalog-card-img {
-        height: 200px;
-    }
+/* ==========================================================================
+   MANTENIMIENTO DE TUS REPORTES (Adaptados a Arva)
+   ========================================================================== */
+.mxm-report-dashboard { background-color: var(--color-bone); }
+.mxm-report-hero {
+    padding: 2rem;
+    border-radius: 20px;
+    background: var(--color-pure-white);
+    border: 1px solid var(--color-moss);
+}
+.mxm-report-title { color: var(--color-forest-ink); font-family: var(--font-serif); }
+.mxm-report-copy, .mxm-report-stat-note { color: var(--color-pewter); }
+.mxm-report-btn-excel { background-color: var(--color-forest-ink); color: #ffffff; }
+.mxm-report-btn-pdf { background-color: var(--color-charcoal); color: #ffffff; }
+.mxm-report-stat-card, .mxm-report-panel {
+    border-radius: 20px;
+    background-color: var(--color-pure-white);
+    border: 1px solid var(--color-moss);
+}
+.mxm-report-stat-icon { background-color: var(--color-sage-card); color: var(--color-forest-ink); }
+.mxm-report-stat-value { color: var(--color-forest-ink); font-family: var(--font-serif); }
+.mxm-report-table tbody tr { background-color: var(--color-ash-gray); border-radius: 12px; }
+
+/* ==========================================================================
+   FOOTER
+   ========================================================================== */
+.mxm-footer {
+    flex-shrink: 0;
+    margin-top: auto;
+    background-color: var(--color-forest-ink);
+    color: var(--color-pure-white);
+}
+
+.mxm-footer h2 {
+    color: var(--color-vivid-lime);
+    font-family: var(--font-sans);
+}
+
+.mxm-footer .text-secondary, .mxm-footer .text-muted {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.mxm-footer a {
+    color: var(--color-pure-white);
+    text-decoration: none;
+    opacity: 0.8;
+}
+
+.mxm-footer a:hover {
+    color: var(--color-vivid-lime);
+    opacity: 1;
+}
+
+.mxm-footer .border-top {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+
+/* Responsive */
+@media (max-width: 991px) {
+    .mxm-nav-shell { border-radius: 20px; }
 }

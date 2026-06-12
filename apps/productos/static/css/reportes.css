@@ -1,0 +1,29 @@
+/* MASXMENOS — reportes styles (exclusive to reportes) */
+
+.mxm-report-dashboard { background-color: var(--color-bone); }
+
+.mxm-report-hero {
+    padding: 2rem;
+    border-radius: 20px;
+    background: var(--color-pure-white);
+    border: 1px solid var(--color-moss);
+}
+
+.mxm-report-title { color: var(--color-forest-ink); font-family: var(--font-serif); }
+
+.mxm-report-copy, .mxm-report-stat-note { color: var(--color-pewter); }
+
+.mxm-report-btn-excel { background-color: var(--color-forest-ink); color: #ffffff; }
+.mxm-report-btn-pdf { background-color: var(--color-charcoal); color: #ffffff; }
+
+.mxm-report-stat-card, .mxm-report-panel {
+    border-radius: 20px;
+    background-color: var(--color-pure-white);
+    border: 1px solid var(--color-moss);
+}
+
+.mxm-report-stat-icon { background-color: var(--color-sage-card); color: var(--color-forest-ink); }
+.mxm-report-stat-value { color: var(--color-forest-ink); font-family: var(--font-serif); }
+
+.mxm-report-table tbody tr { background-color: var(--color-ash-gray); border-radius: 12px; }
+

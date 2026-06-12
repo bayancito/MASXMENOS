@@ -12,6 +12,7 @@ class ProductoForm(forms.ModelForm):
             'nombre',
             'descripcion',
             'categoria',
+            'precio',
             'imagen',
             'activo'
         ]
@@ -27,6 +28,10 @@ class ProductoForm(forms.ModelForm):
 
             'categoria': forms.Select(
                 attrs={'class': 'form-select'}
+            ),
+
+            'precio': forms.NumberInput(
+                attrs={'class': 'form-control', 'step': '0.01', 'min': '0'}
             ),
 
             'imagen': forms.ClearableFileInput(

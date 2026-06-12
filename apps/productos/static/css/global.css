@@ -1,0 +1,130 @@
+/* Importar tipografías de Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600&family=Inter:wght@400;500;600&display=swap');
+
+:root {
+    /* Colores extraídos de la imagen de referencia */
+    --arva-sky: #E0F2FE;      /* Azul claro del botón izquierdo */
+    --arva-forest: #064E3B;   /* Verde oscuro del botón derecho */
+    --arva-forest-hover: #022c22;
+    --arva-text-main: #FFFFFF;
+    
+    /* Fuentes */
+    --font-heading: 'Lora', serif; /* Fuente elegante para títulos */
+    --font-ui: 'Inter', sans-serif; /* Fuente limpia para botones y textos */
+}
+
+body {
+    font-family: var(--font-ui);
+}
+
+/* Clases utilitarias globales de tipografía */
+.arva-heading {
+    font-family: var(--font-heading);
+    font-weight: 500;
+}
+
+/* =========================================
+   BARRA DE NAVEGACIÓN (ESTILO CLARO WIREFRAME)
+   ========================================= */
+.mxm-header {
+    background-color: #F7F9F6 !important; /* Fondo crema claro */
+    position: relative;
+    z-index: 1050; /* Esto asegura que NUNCA quede tapado por un video */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Sombra suave */
+}
+
+.mxm-header .navbar-brand {
+    color: #2F432B !important; /* Texto del logo en verde oscuro */
+    font-size: 1.25rem;
+    letter-spacing: 0.5px;
+}
+
+.mxm-header .nav-link {
+    color: #475569 !important; /* Enlaces en gris oscuro */
+    font-weight: 500;
+}
+
+.mxm-header .nav-link:hover, 
+.mxm-header .nav-link.active {
+    color: #2F432B !important; /* Color más oscuro al pasar el ratón */
+}
+
+/* Botones de usuario en la barra clara */
+.mxm-header .btn-mxm-outline {
+    border: 1px solid #D0E0CC !important;
+    color: #2F432B !important;
+}
+
+.mxm-header .btn-mxm-outline:hover {
+    background-color: #EAF1E8 !important;
+    color: #2F432B !important;
+}
+
+.mxm-header .text-secondary {
+    color: #475569 !important; /* Nombre de usuario en gris oscuro */
+}
+
+/* =========================================
+   BARRA PROMOCIONAL ANIMADA (MARQUEE)
+   ========================================= */
+.arva-marquee {
+    background-color: var(--arva-forest, #064E3B);
+    color: white;
+    padding: 8px 0;
+    overflow: hidden;
+    position: relative;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    display: flex;
+}
+
+.arva-marquee-track {
+    display: flex;
+    /* La animación dura 25 segundos, puedes bajar el número para que vaya más rápido */
+    animation: scroll-marquee 25s linear infinite;
+}
+
+.arva-marquee-track span {
+    padding: 0 30px;
+}
+
+@keyframes scroll-marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+/* =========================================
+   FONDO CREMA PARA TODA LA PLATAFORMA
+   ========================================= */
+body.mxm-body {
+    background-color: #F7F9F6 !important; /* Color crema de la referencia */
+}
+
+/* =========================================
+   FOOTER PREMIUM OSCURO
+   ========================================= */
+footer.mxm-dark-footer {
+    background-color: #152013 !important; /* Verde ultra oscuro */
+    color: #D0E0CC !important; /* Letra color crema pálido */
+}
+
+footer.mxm-dark-footer p,
+footer.mxm-dark-footer span,
+footer.mxm-dark-footer h2,
+footer.mxm-dark-footer h3,
+footer.mxm-dark-footer i {
+    color: inherit !important; /* Obliga a que hereden el color crema */
+}
+
+footer.mxm-dark-footer a {
+    color: rgba(208, 224, 204, 0.8) !important; /* Sobrescribe el azul de Bootstrap */
+    text-decoration: none !important;
+    transition: color 0.2s ease !important;
+}
+
+footer.mxm-dark-footer a:hover {
+    color: #ffffff !important; /* Se ilumina en blanco al pasar el ratón */
+}
+
+footer.mxm-dark-footer .border-top {
+    border-color: rgba(208, 224, 204, 0.1) !important;
+}

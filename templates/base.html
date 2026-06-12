@@ -4,267 +4,211 @@
 <html lang="es">
 
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MASXMENOS{% endblock %}</title>
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
 
-    <title>
-        {% block title %}
-            MASXMENOS
-        {% endblock %}
-    </title>
+    <!-- Leaflet CSS para mapas -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
 
-    <!-- Bootstrap -->
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-    >
+    {% if request.resolver_match.url_name == 'inicio' %}
+        <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    {% endif %}
 
-    <!-- Leaflet CSS -->
-    <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-/>
+    {% if 'reportes' in request.path %}
+        <link rel="stylesheet" href="{% static 'css/reportes.css' %}">
+    {% endif %}
 
-    <!-- CSS propio -->
-    <link
-        rel="stylesheet"
-        href="{% static 'css/masxmenos.css' %}"
-    >
-
+    {% if 'mapa' in request.path %}
+        <link rel="stylesheet" href="{% static 'css/mapa.css' %}">
+    {% endif %}
 </head>
 
 <body class="mxm-body">
 
-    <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-success border-bottom">
-
-        <div class="container">
-
-            <a
-                class="navbar-brand fw-semibold"
-                href="{% url 'inicio' %}"
-            >
-                MASXMENOS
-            </a>
-
-            <button
-                class="navbar-toggler"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#navbarNav"
-                aria-controls="navbarNav"
-                aria-expanded="false"
-                aria-label="Abrir menú"
-            >
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div
-                class="collapse navbar-collapse"
-                id="navbarNav"
-            >
-
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-
-                    <li class="nav-item">
-                        <a
-                            class="nav-link{% if request.resolver_match.url_name == 'inicio' %} active{% endif %}"
-                            href="{% url 'inicio' %}"
-                        >
-                            Inicio
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a
-                            class="nav-link{% if 'productos' in request.path %} active{% endif %}"
-                            href="{% url 'lista_productos' %}"
-                        >
-                            Productos
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a
-                            class="nav-link{% if 'productores' in request.path and request.resolver_match.url_name != 'mapa_productores' %} active{% endif %}"
-                            href="{% url 'lista_productores' %}"
-                        >
-                            Productores
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a
-                            class="nav-link{% if request.resolver_match.url_name == 'mapa_productores' %} active{% endif %}"
-                            href="{% url 'mapa_productores' %}"
-                        >
-                            Mapa de Productores
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a
-                            class="nav-link{% if 'reportes' in request.path %} active{% endif %}"
-                            href="{% url 'reportes' %}"
-                        >
-                            Reportes
-                        </a>
-                    </li>
-
-                </ul>
-
-                <div class="d-flex align-items-center gap-3">
-
-                    {% if user.is_authenticated %}
-
-
-                        <span class="navbar-text small py-0">
-                            {{ user.username }}
-                        </span>
-
-                        <a
-                            href="{% url 'perfil' %}"
-                            class="btn btn-outline-light btn-sm text-decoration-none"
-                        >
-                            Mi perfil
-                        </a>
-
-                        {% if user.is_authenticated and user.perfil.rol == "PRODUCTOR" %}
-                            <a
-                                href="{% url 'solicitudes_recibidas' %}"
-                                class="btn btn-outline-light btn-sm text-decoration-none"
-                            >
-                                Solicitudes recibidas
-                            </a>
-                        {% else %}
-                            <a
-                                href="{% url 'mis_solicitudes' %}"
-                                class="btn btn-outline-light btn-sm text-decoration-none"
-                            >
-                                Mis solicitudes
-                            </a>
-                        {% endif %}
-
-
-                        <a
-                            href="{% url 'mis_favoritos' %}"
-                            class="btn btn-outline-light btn-sm text-decoration-none"
-                        >
-                            Mis favoritos
-                        </a>
-
-                        <form
-                            method="post"
-                            action="{% url 'logout' %}"
-                            class="mb-0"
-                        >
-                            {% csrf_token %}
-
-                            <button
-                                type="submit"
-                                class="btn btn-outline-light btn-sm"
-                            >
-                                Salir
-                            </button>
-
-                        </form>
-
-                    {% else %}
-
-                        <a
-                            href="{% url 'login' %}"
-                            class="btn btn-outline-light btn-sm"
-                        >
-                            Iniciar sesión
-                        </a>
-
-                    {% endif %}
-
-                </div>
-
-            </div>
-
+    <div class="arva-marquee" style="background-color: #064E3B; color: white; padding: 8px 0; overflow: hidden; white-space: nowrap; display: flex;">
+        <div style="display: flex; animation: scroll-marquee 25s linear infinite;">
+            <span style="padding: 0 30px;"><i class="bi bi-search"></i> Proyecto Integrador: Validando la problemática de la intermediación agrícola</span>
+            <span style="padding: 0 30px;"><i class="bi bi-search"></i> Proyecto Integrador: Validando la problemática de la intermediación agrícola</span>
+            <span style="padding: 0 30px;"><i class="bi bi-search"></i> Proyecto Integrador: Validando la problemática de la intermediación agrícola</span>
         </div>
+    </div>
 
-    </nav>
+    {% if request.resolver_match.url_name == 'inicio' %}
+        
+        <header class="mxm-header py-4" style="background-color: #064E3B; z-index: 1050; position: relative;">
+            <div class="container-xl">
+                <nav class="navbar navbar-expand-lg navbar-dark p-0">
+                    <div class="w-100 d-flex flex-column flex-lg-row align-items-center justify-content-between gap-3">
+                        <a class="navbar-brand fw-bold text-white mb-0" href="{% url 'inicio' %}">MASXMENOS</a>
 
-    <!-- CONTENIDO -->
+                        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
 
-    <main class="container mxm-main">
+                        <div class="collapse navbar-collapse" id="navbarNav">
+                            <ul class="navbar-nav mx-auto mb-2 mb-lg-0 align-items-lg-center">
+                                <li class="nav-item"><a class="nav-link text-white fw-bold" href="{% url 'inicio' %}">Inicio</a></li>
+                                <li class="nav-item"><a class="nav-link text-white-50" href="{% url 'lista_productos' %}">Productos</a></li>
+                                <li class="nav-item"><a class="nav-link text-white-50" href="{% url 'lista_productores' %}">Productores</a></li>
+                                <li class="nav-item"><a class="nav-link text-white-50" href="{% url 'mapa_productores' %}">Mapa</a></li>
+                                <li class="nav-item"><a class="nav-link text-white-50" href="{% url 'reportes' %}">Reportes</a></li>
+                            </ul>
 
+                            <div class="d-flex flex-wrap gap-2 align-items-center justify-content-end">
+                                {% if user.is_authenticated %}
+                                    <span class="text-white-50 small d-none d-lg-inline me-2">{{ user.username }}</span>
+                                    <a href="{% url 'perfil' %}" class="btn btn-outline-light btn-sm">Mi perfil</a>
+                                    {% if user.perfil.rol == "COMPRADOR" %}
+                                        <a href="{% url 'dashboard_comprador' %}" class="btn btn-outline-light btn-sm">Mi panel</a>
+                                    {% elif user.perfil.rol == "PRODUCTOR" %}
+                                        <a href="{% url 'dashboard_productor' %}" class="btn btn-outline-light btn-sm">Mi panel</a>
+                                    {% endif %}
+                                    <a href="{% url 'mis_favoritos' %}" class="btn btn-outline-light btn-sm">Favoritos</a>
+                                    <form method="post" action="{% url 'logout' %}" class="mb-0">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-light btn-sm text-dark fw-medium">Salir</button>
+                                    </form>
+                                {% else %}
+                                    <a href="{% url 'login' %}" class="btn btn-light btn-sm text-dark fw-medium">Iniciar sesión</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </header>
+
+    {% else %}
+
+        <header class="mxm-header py-3 border-bottom shadow-sm" style="background-color: #F7F9F6; z-index: 1050; position: relative;">
+            <div class="container-xl">
+                <nav class="navbar navbar-expand-lg navbar-light p-0">
+                    <div class="w-100 d-flex flex-column flex-lg-row align-items-center justify-content-between gap-3">
+                        <a class="navbar-brand fw-bold mb-0" href="{% url 'inicio' %}" style="color: #064E3B;">MASXMENOS</a>
+
+                        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavClaro">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+
+                        <div class="collapse navbar-collapse" id="navbarNavClaro">
+                            <ul class="navbar-nav mx-auto mb-2 mb-lg-0 align-items-lg-center">
+                                <li class="nav-item"><a class="nav-link text-secondary" href="{% url 'inicio' %}">Inicio</a></li>
+                                <li class="nav-item"><a class="nav-link {% if 'productos' in request.path %}text-dark fw-bold{% else %}text-secondary{% endif %}" href="{% url 'lista_productos' %}">Productos</a></li>
+                                <li class="nav-item"><a class="nav-link {% if 'productores' in request.path %}text-dark fw-bold{% else %}text-secondary{% endif %}" href="{% url 'lista_productores' %}">Productores</a></li>
+                                <li class="nav-item"><a class="nav-link {% if 'mapa' in request.path %}text-dark fw-bold{% else %}text-secondary{% endif %}" href="{% url 'mapa_productores' %}">Mapa</a></li>
+                                <li class="nav-item"><a class="nav-link {% if 'reportes' in request.path %}text-dark fw-bold{% else %}text-secondary{% endif %}" href="{% url 'reportes' %}">Reportes</a></li>
+                            </ul>
+
+                            <div class="d-flex flex-wrap gap-2 align-items-center justify-content-end">
+                                {% if user.is_authenticated %}
+                                    <span class="text-secondary fw-medium small d-none d-lg-inline me-2">{{ user.username }}</span>
+                                    <a href="{% url 'perfil' %}" class="btn btn-outline-secondary btn-sm">Mi perfil</a>
+                                    {% if user.perfil.rol == "COMPRADOR" %}
+                                        <a href="{% url 'dashboard_comprador' %}" class="btn btn-outline-secondary btn-sm">Mi panel</a>
+                                    {% elif user.perfil.rol == "PRODUCTOR" %}
+                                        <a href="{% url 'dashboard_productor' %}" class="btn btn-outline-secondary btn-sm">Mi panel</a>
+                                    {% endif %}
+                                    <a href="{% url 'mis_favoritos' %}" class="btn btn-outline-secondary btn-sm">Favoritos</a>
+                                    <form method="post" action="{% url 'logout' %}" class="mb-0">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-dark btn-sm text-white fw-medium">Salir</button>
+                                    </form>
+                                {% else %}
+                                    <a href="{% url 'login' %}" class="btn btn-success btn-sm fw-medium">Iniciar sesión</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </header>
+
+    {% endif %}
+
+    <main class="container-xl mxm-main mt-4">
         {% block content %}
         {% endblock %}
-
     </main>
 
-    <!-- FOOTER -->
+        <!-- ==========================================
+         FOOTER PREMIUM (Estilo Agromercado adaptado)
+         ========================================== -->
+    <footer class="mt-auto pt-5 pb-4 mt-5 mxm-dark-footer">
+        <div class="container-xl">
+            <div class="row gy-5 mb-5">
+                <!-- Columna 1: Marca y descripción -->
+                <div class="col-lg-3 col-md-6 pe-lg-4">
+                    <a href="{% url 'inicio' %}" class="d-flex align-items-center gap-2 text-white text-decoration-none mb-4">
+                        <i class="bi bi-tree text-success fs-4"></i>
+                        <span class="fs-5 fw-bold tracking-tight">MASXMENOS</span>
+                    </a>
+                    <p class="small footer-text lh-lg mb-0">
+                        Conectando directamente a productores del campo en Cochabamba con compradores. Comercio justo, fresco y transparente.
+                    </p>
+                </div>
 
-    <footer class="mxm-footer">
+                <!-- Columna 2: Para Compradores -->
+                <div class="col-lg-3 col-md-6">
+                    <h3 class="h6 text-white fw-semibold mb-4">Para Compradores</h3>
+                    <ul class="list-unstyled footer-links small">
+                        <li><a href="{% url 'lista_productos' %}">Explorar productos</a></li>
+                        <li><a href="{% url 'mapa_productores' %}">Mapa de productores</a></li>
+                        <li><a href="#">Garantía de calidad</a></li>
+                        <li><a href="#">Preguntas frecuentes</a></li>
+                    </ul>
+                </div>
 
-        <div class="container d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2">
+                <!-- Columna 3: Para Productores -->
+                <div class="col-lg-3 col-md-6">
+                    <h3 class="h6 text-white fw-semibold mb-4">Para Productores</h3>
+                    <ul class="list-unstyled footer-links small">
+                        <li><a href="{% url 'lista_productores' %}">Directorio de productores</a></li>
+                        <li><a href="{% url 'reportes' %}">Reportes de mercado</a></li>
+                        <li><a href="#">Requisitos de calidad</a></li>
+                        <li><a href="#">Centro de ayuda</a></li>
+                    </ul>
+                </div>
 
-            <span>
-                MASXMENOS — Plataforma agrícola, Cochabamba
-            </span>
+                <!-- Columna 4: Contacto -->
+                <div class="col-lg-3 col-md-6">
+                    <h3 class="h6 text-white fw-semibold mb-4">Contacto</h3>
+                    <ul class="list-unstyled footer-text small">
+                        <li class="d-flex align-items-center gap-3 mb-3">
+                            <i class="bi bi-envelope text-success"></i>
+                            <span>contacto@masxmenos.com.bo</span>
+                        </li>
+                        <li class="d-flex align-items-center gap-3 mb-3">
+                            <i class="bi bi-telephone text-success"></i>
+                            <span>+591 7000-0000</span>
+                        </li>
+                        <li class="d-flex align-items-start gap-3">
+                            <i class="bi bi-geo-alt text-success mt-1"></i>
+                            <span>Cochabamba,<br>Bolivia</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
 
-            <span>
-
-                <a href="{% url 'inicio' %}">
-                    Inicio
-                </a>
-
-                <span class="text-muted mx-1">·</span>
-
-                <a href="{% url 'lista_productos' %}">
-                    Productos
-                </a>
-
-                <span class="text-muted mx-1">·</span>
-
-                <a href="{% url 'lista_productores' %}">
-                    Productores
-                </a>
-
-                <span class="text-muted mx-1">·</span>
-
-                <a href="{% url 'mapa_productores' %}">
-                    Mapa
-                </a>
-
-                <span class="text-muted mx-1">·</span>
-
-                <a href="{% url 'reportes' %}">
-                    Reportes
-                </a>
-
-                <span class="text-muted mx-1">·</span>
-
-                <span class="text-muted">
-                    &copy; {% now "Y" %}
-                </span>
-
-            </span>
-
+            <!-- Footer Inferior (Derechos) -->
+            <div class="pt-4 border-top footer-bottom d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 small">
+                <p class="mb-0">© {% now "Y" %} MASXMENOS. Todos los derechos reservados.</p>
+                <div class="d-flex gap-4">
+                    <a href="#">Términos y Condiciones</a>
+                    <a href="#">Aviso de Privacidad</a>
+                </div>
+            </div>
         </div>
-
     </footer>
 
-    <!-- JS -->
-
-    
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-
-<script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
-</script>
-
-{% block extra_js %}
-{% endblock %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Leaflet JS para mapas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    {% block extra_js %}{% endblock %}
 </body>
 
 </html>

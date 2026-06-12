@@ -7,14 +7,23 @@ Mapa de Productores
 
 {% block content %}
 
-<h1 class="mb-4">
-    Mapa de Productores
-</h1>
+<div class="container-xl py-5">
+    <div class="mapa-header mb-5">
+        <h1 class="h2 fw-bold mb-2">Mapa de Productores</h1>
+        <p class="text-secondary">
+            Localiza productores agrícolas en Cochabamba. Haz clic en los marcadores para ver más información.
+        </p>
+    </div>
 
-<div
-    id="mapa-productores"
-    style="height:600px;width:100%;"
-></div>
+    <div class="row g-4">
+        <div class="col-12">
+            <div
+                id="mapa-productores"
+                style="height: 600px; width: 100%; border-radius: 12px;"
+            ></div>
+        </div>
+    </div>
+</div>
 
 <div id="datos-productores" style="display:none;">
 
@@ -26,6 +35,7 @@ Mapa de Productores
             data-lat="{% localize off %}{{ productor.latitud }}{% endlocalize %}"
             data-lng="{% localize off %}{{ productor.longitud }}{% endlocalize %}"
             data-nombre="{{ productor.nombre_comercial }}"
+            data-id="{{ productor.id }}"
         ></span>
 
         {% endif %}
@@ -46,7 +56,8 @@ document.addEventListener('DOMContentLoaded', function () {
     L.tileLayer(
         'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
         {
-            maxZoom: 19
+            maxZoom: 19,
+            attribution: '© OpenStreetMap contributors'
         }
     ).addTo(mapa);
 
@@ -57,10 +68,17 @@ document.addEventListener('DOMContentLoaded', function () {
             var lat = parseFloat(item.dataset.lat);
             var lng = parseFloat(item.dataset.lng);
             var nombre = item.dataset.nombre;
+            var id = item.dataset.id;
 
-            L.marker([lat, lng])
-                .addTo(mapa)
-                .bindPopup(nombre);
+            var marker = L.marker([lat, lng])
+                .addTo(mapa);
+            
+            var popupContent = '<div class="text-center">' +
+                '<strong>' + nombre + '</strong><br>' +
+                '<a href="/productores/' + id + '/" class="btn btn-sm btn-outline-success mt-2">Ver detalles</a>' +
+                '</div>';
+            
+            marker.bindPopup(popupContent);
 
         });
 

@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
+from apps.productos.views import dashboard_comprador
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -39,6 +40,12 @@ urlpatterns = [
     path(
         'reportes/',
         include('apps.reportes.urls')
+    ),
+
+    path(
+        'mi-panel/',
+        dashboard_comprador,
+        name='dashboard_comprador'
     ),
 
 ]
