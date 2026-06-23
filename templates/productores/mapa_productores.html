@@ -73,12 +73,29 @@ document.addEventListener('DOMContentLoaded', function () {
             var marker = L.marker([lat, lng])
                 .addTo(mapa);
             
-            var popupContent = '<div class="text-center">' +
-                '<strong>' + nombre + '</strong><br>' +
-                '<a href="/productores/' + id + '/" class="btn btn-sm btn-outline-success mt-2">Ver detalles</a>' +
-                '</div>';
-            
-            marker.bindPopup(popupContent);
+            // Construcción segura del contenido del popup para evitar XSS:
+            // - Insertamos el nombre usando textContent (no concatenación HTML cruda)
+            // - Usamos el id como parte de la URL evitando inyección en HTML
+            var popupEl = document.createElement('div');
+            popupEl.className = 'text-center';
+
+            var strongEl = document.createElement('strong');
+            strongEl.textContent = String(nombre ?? '');
+
+            var brEl = document.createElement('br');
+
+            var aEl = document.createElement('a');
+            aEl.className = 'btn btn-sm btn-outline-success mt-2';
+            aEl.textContent = 'Ver detalles';
+
+            // Evita romper el HTML si id trae caracteres raros
+            aEl.href = '/productores/' + encodeURIComponent(String(id ?? '')) + '/';
+
+            popupEl.appendChild(strongEl);
+            popupEl.appendChild(brEl);
+            popupEl.appendChild(aEl);
+
+            marker.bindPopup(popupEl);
 
         });
 

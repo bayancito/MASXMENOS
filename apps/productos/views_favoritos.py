@@ -1,18 +1,18 @@
 from django.shortcuts import get_object_or_404, redirect, render
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # noqa: F401 (se mantiene por compatibilidad)
+from apps.usuarios.decorators import es_comprador
 
 from .models import Producto, Favorito
 
 
-@login_required
+@es_comprador
 def agregar_favorito(request, producto_id):
     producto = get_object_or_404(Producto, pk=producto_id)
     Favorito.objects.get_or_create(usuario=request.user, producto=producto)
     return redirect('detalle_producto', pk=producto.id)
 
 
-@login_required
+@es_comprador
 def mis_favoritos(request):
     favoritos = (
         Favorito.objects.filter(usuario=request.user)

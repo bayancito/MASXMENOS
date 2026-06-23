@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Nueva Incidencia - MASXMENOS{% endblock %}
+
+{% block content %}
+<div class="container-xl py-5">
+  <div class="row g-4">
+    <div class="col-12 col-lg-7">
+      <h1 class="h3 fw-bold mb-1">Reportar una incidencia</h1>
+      <p class="text-secondary mb-4">
+        Completa los datos del problema logístico (bloqueos, clima, etc.).
+      </p>
+
+      <div style="border: 1px solid #EAF1E8; border-radius: 0.75rem; overflow: hidden;">
+        <form method="post" class="p-4">
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label for="{{ form.tipo_incidencia.id_for_label }}" class="form-label fw-medium">
+              Tipo de incidencia
+            </label>
+            {{ form.tipo_incidencia }}
+          </div>
+
+          <div class="mb-3">
+            <label for="{{ form.descripcion.id_for_label }}" class="form-label fw-medium">
+              Descripción
+            </label>
+            {{ form.descripcion }}
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-success">Enviar reporte</button>
+            <a href="{% url 'incidencias_list' %}" class="btn btn-outline-secondary">Cancelar</a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-5">
+      <div class="p-4" style="border: 1px dashed #EAF1E8; border-radius: 0.75rem;">
+        <h2 class="h5 fw-bold mb-2">Consejos</h2>
+        <ul class="text-secondary mb-0" style="font-size: 0.95rem;">
+          <li>Incluye ubicación aproximada o contexto del evento.</li>
+          <li>Explica brevemente el impacto logístico.</li>
+          <li>Evita datos personales sensibles.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

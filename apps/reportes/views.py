@@ -2,8 +2,9 @@ import json
 
 from django.db.models import Count
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.utils import timezone
+from apps.usuarios.decorators import es_admin
 from io import BytesIO
 from openpyxl import Workbook
 from reportlab.lib import colors
@@ -18,8 +19,13 @@ from reportlab.platypus import (
 
 from apps.productos.models import Producto, Categoria
 from apps.productores.models import Productor
+from django.contrib import messages
+
+from .forms import IncidenciaForm
+from .models import Incidencia
 
 
+@es_admin
 def reportes(request):
 
     categorias = Categoria.objects.annotate(
@@ -89,6 +95,7 @@ def reportes(request):
     )
 
 
+@es_admin
 def exportar_productos_excel(request):
 
     wb = Workbook()
@@ -124,6 +131,7 @@ def exportar_productos_excel(request):
     return response
 
 
+@es_admin
 def exportar_productores_excel(request):
 
     wb = Workbook()
@@ -160,6 +168,56 @@ def exportar_productores_excel(request):
     return response
 
 
+@es_admin
+def crear_incidencia(request):
+    """
+    Vista para reportar (crear) una incidencia logística.
+    Asigna automáticamente el usuario actual.
+    """
+    if request.method == "POST":
+        form = IncidenciaForm(request.POST)
+        if form.is_valid():
+            incidencia = form.save(commit=False)
+            incidencia.usuario = request.user
+            incidencia.save()
+            messages.success(
+                request,
+                "Incidencia enviada correctamente. Gracias por tu reporte.",
+            )
+            return redirect("incidencias_list")
+        messages.error(
+            request,
+            "No fue posible enviar el reporte. Revisa los datos e intenta nuevamente.",
+        )
+    else:
+        form = IncidenciaForm()
+
+    return render(
+        request,
+        "reportes/incidencia_form.html",
+        {
+            "form": form,
+        },
+    )
+
+
+@es_admin
+def incidencia_list(request):
+    """
+    Lista de incidencias activas, ordenadas por fecha descendente.
+    """
+    incidencias = Incidencia.objects.filter(activa=True).order_by("-fecha_reporte")
+
+    return render(
+        request,
+        "reportes/incidencia_list.html",
+        {
+            "incidencias": incidencias,
+        },
+    )
+
+
+@es_admin
 def exportar_pdf(request):
 
     buffer = BytesIO()

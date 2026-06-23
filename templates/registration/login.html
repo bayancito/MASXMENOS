@@ -1,59 +1,158 @@
-{% extends 'base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - MASXMENOS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* ── RESET BÁSICO ── */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
-{% block title %}
-Iniciar Sesión
-{% endblock %}
+        /* ── 1. FONDO PANTALLA COMPLETA ── */
+        .login-fullscreen {
+            position: fixed;
+            inset: 0;
+            background-image: url('{% static "img/plantacion.jpg" %}'); /* Imagen de fondo exterior */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
 
-{% block content %}
+        /* ── 2. LA TARJETA BLANCA ── */
+        .login-card {
+            display: flex;
+            width: 950px;
+            max-width: 95%;
+            min-height: 550px;
+            background: #ffffff;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            border-radius: 4px;
+            overflow: hidden;
+        }
 
-<div class="row justify-content-center mt-5">
+        /* ── 3. PANEL IZQUIERDO (Imagen y Textos) ── */
+        .login-left {
+            flex: 1;
+            position: relative;
+            background-image: url('{% static "img/cosecha.jpg" %}'); /* Imagen del panel interior */
+            background-size: cover;
+            background-position: center;
+            padding: 40px;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
 
-    <div class="col-md-4">
+        .login-left::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45); /* Capa oscura simple, sin gradientes raros */
+            z-index: 1;
+        }
 
-        <div class="card shadow">
+        .login-left-content { position: relative; z-index: 2; }
+        .login-left h2 { font-size: 42px; font-weight: 800; line-height: 1.1; margin-bottom: 20px; letter-spacing: -1px; }
+        .login-left p { font-size: 13px; line-height: 1.6; margin-bottom: 30px; color: rgba(255,255,255,0.9); }
 
-            <div class="card-header bg-success text-white">
-                <h4 class="mb-0">
-                    Iniciar Sesión
-                </h4>
-            </div>
+        .social-buttons { display: flex; gap: 10px; }
+        .btn-social { padding: 10px 20px; border-radius: 50px; border: none; color: white; font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; display: flex; align-items: center; gap: 8px;}
+        .btn-fb { background: #3b5998; }
+        .btn-tw { background: #00ADEF; }
 
-            <div class="card-body">
+        /* ── 4. PANEL DERECHO (Formulario) ── */
+        .login-right {
+            flex: 1; padding: 60px 50px; background: #ffffff; display: flex; flex-direction: column; justify-content: center;
+        }
+        .login-right h3 { font-size: 32px; font-weight: 800; color: #111; margin-bottom: 45px; }
 
-                <form method="post">
+        /* Estilo exacto de los inputs con línea inferior */
+        .custom-input {
+            width: 100%; border: none; border-bottom: 2px solid #3b5998; padding: 10px 0; margin-bottom: 30px; font-size: 14px; background: transparent; outline: none; transition: border-color 0.3s;
+        }
+        .custom-input:focus { border-bottom-color: #064E3B; }
+        .custom-input::placeholder { color: #888; font-weight: 500; }
 
-                    {% csrf_token %}
+        .form-actions { display: flex; justify-content: flex-end; margin-bottom: 40px; margin-top: 10px; }
+        .btn-enviar { background: #3b5998; color: #ffffff; border: none; padding: 12px 35px; border-radius: 50px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.3s; }
+        .btn-enviar:hover { background: #2d4373; }
 
-                    {{ form.as_p }}
+        .register-text { text-align: center; font-size: 13px; color: #555; }
+        .register-text a { color: #6a4c9c; font-weight: 600; text-decoration: none; }
+        
+        .error-message { color: #dc3545; font-size: 12px; margin-bottom: 15px; }
 
-                    <button
-                        type="submit"
-                        class="btn btn-success w-100">
+        @media (max-width: 768px) { .login-card { flex-direction: column; min-height: auto; } }
+    </style>
+</head>
+<body>
 
-                        Ingresar
-
-                    </button>
-
-                </form>
-
-                <div class="text-center mt-3">
-                    <span class="text-secondary">
-                        ¿No tienes cuenta?
-                    </span>
-                    <a
-                        href="{% url 'registro' %}"
-                        class="fw-semibold text-success text-decoration-none"
-                    >
-                        Regístrate aquí
-                    </a>
+<div class="login-fullscreen">
+    <div class="login-card">
+        
+        <div class="login-left">
+            <div class="login-left-content">
+                <h2>Hola<br>de nuevo.</h2>
+                <p>
+                    Accede a tu cuenta para continuar fortaleciendo el comercio agrícola de Cochabamba. 
+                    Conecta directamente con productores y compradores en un entorno seguro.
+                </p>
+                <div style="font-size: 11px; margin-bottom: 12px; font-weight: 600; color: white;">Login con redes sociales</div>
+                <div class="social-buttons">
+                    <button type="button" class="btn-social btn-fb">Facebook <i class="fab fa-facebook-f"></i></button>
+                    <button type="button" class="btn-social btn-tw">Twitter <i class="fab fa-twitter"></i></button>
                 </div>
-
             </div>
+        </div>
 
+        <div class="login-right">
+            <h3>Login</h3>
+
+            {% if form.non_field_errors %}
+                <div class="error-message">
+                    {% for error in form.non_field_errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            <form method="post" novalidate>
+                {% csrf_token %}
+                
+                <div style="position: relative;">
+                    <input type="{{ form.username.field.widget.input_type }}" name="{{ form.username.name }}" id="{{ form.username.id_for_label }}" class="custom-input" placeholder="Usuario" required>
+                    {% if form.username.errors %}
+                        <div class="error-message" style="margin-top: -20px; margin-bottom: 20px;">{{ form.username.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                
+                <div style="position: relative;">
+                    <input type="password" name="{{ form.password.name }}" id="{{ form.password.id_for_label }}" class="custom-input" placeholder="Password" required>
+                    {% if form.password.errors %}
+                        <div class="error-message" style="margin-top: -20px; margin-bottom: 20px;">{{ form.password.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn-enviar">Enviar</button>
+                </div>
+            </form>
+            
+            <div class="register-text">
+                ¿No tienes cuenta? <a href="{% url 'registro' %}">Regístrate</a>
+            </div>
         </div>
 
     </div>
-
 </div>
 
-{% endblock %}
+</body>
+</html>

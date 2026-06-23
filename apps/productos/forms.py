@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Producto, Solicitud
+from .models import Producto, Solicitud, Cosecha
 
 
 class ProductoForm(forms.ModelForm):
@@ -57,5 +57,30 @@ class SolicitudForm(forms.ModelForm):
             'mensaje': forms.Textarea(
                 attrs={'class': 'form-control', 'rows': 4}
             ),
+        }
+
+
+class CosechaForm(forms.ModelForm):
+
+    class Meta:
+        model = Cosecha
+        fields = [
+            'producto',
+            'cantidad',
+            'unidad_medida',
+            'precio_esperado',
+            'fecha_cosecha',
+            'estado',
+            'fotografia',
+        ]
+
+        widgets = {
+            'producto': forms.Select(attrs={'class': 'form-select'}),
+            'cantidad': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0'}),
+            'unidad_medida': forms.Select(attrs={'class': 'form-select'}),
+            'precio_esperado': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0'}),
+            'fecha_cosecha': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'estado': forms.Select(attrs={'class': 'form-select'}),
+            'fotografia': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }
 

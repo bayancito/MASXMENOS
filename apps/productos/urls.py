@@ -8,6 +8,10 @@ from .views import (
     eliminar_producto,
     solicitar_producto,
     dashboard_productor,
+    crear_cosecha,
+    mis_cosechas,
+    editar_cosecha,
+    eliminar_cosecha,
 )
 
 
@@ -56,4 +60,27 @@ urlpatterns = favoritos_urls + [
         name='dashboard_productor'
     ),
 
+    path(
+        'cosechas/nueva/',
+        crear_cosecha,
+        name='crear_cosecha'
+    ),
+
+    path(
+        'cosechas/mis/',
+        mis_cosechas,
+        name='mis_cosechas'
+    ),
+
+    path(
+        'cosechas/<int:pk>/editar/',
+        editar_cosecha,
+        name='editar_cosecha'
+    ),
+
+    path(
+        'cosechas/<int:pk>/eliminar/',
+        eliminar_cosecha,
+        name='eliminar_cosecha'
+    ),
 ]

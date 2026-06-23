@@ -1,0 +1,312 @@
+{% load static l10n %}
+
+<section class="producer-profile-form">
+    <header class="producer-form-header">
+        <div>
+            <p class="producer-form-kicker">
+                {% if modo_formulario == 'editar' %}Actualizar perfil{% else %}Nuevo productor{% endif %}
+            </p>
+            <h1>
+                {% if modo_formulario == 'editar' %}Editar Perfil de Productor{% else %}Crear Nuevo Perfil de Productor{% endif %}
+            </h1>
+        </div>
+
+        <a href="{% url 'lista_productores' %}" class="producer-form-back">
+            <i class="bi bi-arrow-left"></i>
+            Volver al listado
+        </a>
+    </header>
+
+    <form method="post" enctype="multipart/form-data" class="producer-editor-card" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="producer-form-alert">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <div class="producer-editor-grid">
+            <div class="producer-form-panel">
+                <h2>Detalles de la Finca</h2>
+
+                {% if user.perfil.rol == 'ADMIN' %}
+                    <div class="producer-field">
+                        <label for="{{ form.usuario.id_for_label }}">{{ form.usuario.label }}</label>
+                        {{ form.usuario }}
+                        {{ form.usuario.errors }}
+                    </div>
+                {% endif %}
+
+                <div class="producer-field">
+                    <label for="{{ form.nombre_comercial.id_for_label }}">{{ form.nombre_comercial.label }}</label>
+                    {{ form.nombre_comercial }}
+                    {{ form.nombre_comercial.errors }}
+                </div>
+
+                <div class="producer-field-grid">
+                    <div class="producer-field">
+                        <label for="{{ form.telefono.id_for_label }}">{{ form.telefono.label }}</label>
+                        {{ form.telefono }}
+                        {{ form.telefono.errors }}
+                    </div>
+
+                    <div class="producer-field">
+                        <label for="{{ form.municipio.id_for_label }}">{{ form.municipio.label }}</label>
+                        {{ form.municipio }}
+                        {{ form.municipio.errors }}
+                    </div>
+                </div>
+
+                <div class="producer-field">
+                    <label for="{{ form.direccion.id_for_label }}">{{ form.direccion.label }}</label>
+                    {{ form.direccion }}
+                    {{ form.direccion.errors }}
+                </div>
+
+                <datalist id="municipios-productor">
+                    <option value="Cochabamba">
+                    <option value="Sacaba">
+                    <option value="Quillacollo">
+                    <option value="Tiquipaya">
+                    <option value="Colcapirhua">
+                    <option value="Vinto">
+                    <option value="Sipe Sipe">
+                    <option value="Cliza">
+                    <option value="Punata">
+                    <option value="Tarata">
+                </datalist>
+
+                <div class="producer-field">
+                    <label for="{{ form.descripcion.id_for_label }}">{{ form.descripcion.label }}</label>
+                    {{ form.descripcion }}
+                    {{ form.descripcion.errors }}
+                </div>
+
+                <div class="producer-field">
+                    <label for="{{ form.imagen_perfil.id_for_label }}">{{ form.imagen_perfil.label }}</label>
+                    <div class="producer-image-uploader">
+                        <div class="producer-image-preview">
+                            {% if productor and productor.imagen_perfil %}
+                                <img id="producer-image-preview" src="{{ productor.imagen_perfil.url }}" alt="{{ productor.nombre_comercial }}">
+                            {% else %}
+                                <img id="producer-image-preview" src="{% static 'img/plantacion.jpg' %}" alt="Vista previa del productor">
+                            {% endif %}
+                        </div>
+                        <div>
+                            {{ form.imagen_perfil }}
+                            {{ form.imagen_perfil.errors }}
+                            <p>Usa una foto horizontal o cuadrada. Se vera mejor en las tarjetas del directorio.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="producer-active-row">
+                    {{ form.activo }}
+                    <label for="{{ form.activo.id_for_label }}">{{ form.activo.label }}</label>
+                    {{ form.activo.errors }}
+                </div>
+            </div>
+
+            <aside class="producer-location-panel">
+                <h2>Ubicacion en el mapa</h2>
+                <div
+                    id="producer-form-map"
+                    data-lat="{% localize off %}{{ form.latitud.value|default_if_none:'' }}{% endlocalize %}"
+                    data-lng="{% localize off %}{{ form.longitud.value|default_if_none:'' }}{% endlocalize %}"
+                ></div>
+
+                <p class="producer-map-hint">
+                    Haz clic en el mapa para fijar la ubicacion o usa el boton de autodetectar.
+                </p>
+
+                <button type="button" class="producer-detect-btn" id="producer-detect-location">
+                    <i class="bi bi-crosshair"></i>
+                    Detectar Ubicacion Actual
+                </button>
+
+                <div class="producer-coordinate-grid">
+                    <div class="producer-field">
+                        <label for="{{ form.latitud.id_for_label }}">{{ form.latitud.label }}</label>
+                        {{ form.latitud }}
+                        {{ form.latitud.errors }}
+                    </div>
+
+                    <div class="producer-field">
+                        <label for="{{ form.longitud.id_for_label }}">{{ form.longitud.label }}</label>
+                        {{ form.longitud }}
+                        {{ form.longitud.errors }}
+                    </div>
+                </div>
+
+                <div class="producer-card-preview">
+                    <p>Vista previa de la tarjeta</p>
+                    <article class="producer-preview-card">
+                        <div class="producer-preview-media">
+                            {% if productor and productor.imagen_perfil %}
+                                <img id="producer-card-preview-img" src="{{ productor.imagen_perfil.url }}" alt="{{ productor.nombre_comercial }}">
+                            {% else %}
+                                <img id="producer-card-preview-img" src="{% static 'img/plantacion.jpg' %}" alt="Vista previa">
+                            {% endif %}
+                            <span>
+                                <i class="bi bi-patch-check"></i>
+                                Productor verificado
+                            </span>
+                        </div>
+                        <div class="producer-preview-body">
+                            <h3 id="producer-preview-name">
+                                {{ form.nombre_comercial.value|default:"Nombre del productor" }}
+                            </h3>
+                            <p>
+                                <i class="bi bi-geo-alt"></i>
+                                <span id="producer-preview-place">{{ form.municipio.value|default:"Municipio" }}</span>
+                            </p>
+                            <small id="producer-preview-description">
+                                {{ form.descripcion.value|default:"Productos frescos de temporada directamente del productor."|truncatechars:92 }}
+                            </small>
+                        </div>
+                    </article>
+                </div>
+            </aside>
+        </div>
+
+        <div class="producer-form-actions">
+            <button type="submit" class="producer-submit-btn">
+                <i class="bi bi-check2-circle"></i>
+                {% if modo_formulario == 'editar' %}Guardar cambios{% else %}Crear Perfil{% endif %}
+            </button>
+
+            <a href="{% url 'lista_productores' %}" class="producer-cancel-btn">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var mapEl = document.getElementById('producer-form-map');
+    var latInput = document.getElementById('{{ form.latitud.id_for_label }}');
+    var lngInput = document.getElementById('{{ form.longitud.id_for_label }}');
+    var detectBtn = document.getElementById('producer-detect-location');
+    var imageInput = document.getElementById('{{ form.imagen_perfil.id_for_label }}');
+    var imagePreview = document.getElementById('producer-image-preview');
+    var cardPreviewImage = document.getElementById('producer-card-preview-img');
+    var nameInput = document.getElementById('{{ form.nombre_comercial.id_for_label }}');
+    var placeInput = document.getElementById('{{ form.municipio.id_for_label }}');
+    var descriptionInput = document.getElementById('{{ form.descripcion.id_for_label }}');
+    var previewName = document.getElementById('producer-preview-name');
+    var previewPlace = document.getElementById('producer-preview-place');
+    var previewDescription = document.getElementById('producer-preview-description');
+
+    function parseCoordinate(value) {
+        if (!value) {
+            return null;
+        }
+
+        var parsed = parseFloat(String(value).replace(',', '.'));
+        return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    function setInputs(lat, lng) {
+        latInput.value = Number(lat).toFixed(6);
+        lngInput.value = Number(lng).toFixed(6);
+    }
+
+    var initialLat = parseCoordinate(mapEl.dataset.lat) || parseCoordinate(latInput.value) || -17.393500;
+    var initialLng = parseCoordinate(mapEl.dataset.lng) || parseCoordinate(lngInput.value) || -66.157000;
+    var hasInitialLocation = parseCoordinate(latInput.value) !== null && parseCoordinate(lngInput.value) !== null;
+
+    var map = L.map('producer-form-map').setView([initialLat, initialLng], hasInitialLocation ? 15 : 12);
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: 'OpenStreetMap contributors'
+    }).addTo(map);
+
+    var marker = L.marker([initialLat, initialLng], {
+        draggable: true
+    }).addTo(map);
+
+    marker.on('dragend', function () {
+        var position = marker.getLatLng();
+        setInputs(position.lat, position.lng);
+    });
+
+    map.on('click', function (event) {
+        marker.setLatLng(event.latlng);
+        setInputs(event.latlng.lat, event.latlng.lng);
+    });
+
+    latInput.addEventListener('change', function () {
+        var lat = parseCoordinate(latInput.value);
+        var lng = parseCoordinate(lngInput.value);
+        if (lat !== null && lng !== null) {
+            marker.setLatLng([lat, lng]);
+            map.setView([lat, lng], 15);
+        }
+    });
+
+    lngInput.addEventListener('change', function () {
+        var lat = parseCoordinate(latInput.value);
+        var lng = parseCoordinate(lngInput.value);
+        if (lat !== null && lng !== null) {
+            marker.setLatLng([lat, lng]);
+            map.setView([lat, lng], 15);
+        }
+    });
+
+    detectBtn.addEventListener('click', function () {
+        if (!navigator.geolocation) {
+            detectBtn.textContent = 'Geolocalizacion no disponible';
+            return;
+        }
+
+        detectBtn.disabled = true;
+        detectBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Detectando...';
+
+        navigator.geolocation.getCurrentPosition(
+            function (position) {
+                var lat = position.coords.latitude;
+                var lng = position.coords.longitude;
+                marker.setLatLng([lat, lng]);
+                map.setView([lat, lng], 16);
+                setInputs(lat, lng);
+                detectBtn.disabled = false;
+                detectBtn.innerHTML = '<i class="bi bi-crosshair"></i> Detectar Ubicacion Actual';
+            },
+            function () {
+                detectBtn.disabled = false;
+                detectBtn.innerHTML = '<i class="bi bi-exclamation-circle"></i> No se pudo detectar';
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000
+            }
+        );
+    });
+
+    if (imageInput) {
+        imageInput.addEventListener('change', function () {
+            var file = imageInput.files && imageInput.files[0];
+            if (!file) {
+                return;
+            }
+
+            var imageUrl = URL.createObjectURL(file);
+            imagePreview.src = imageUrl;
+            cardPreviewImage.src = imageUrl;
+        });
+    }
+
+    function syncPreview() {
+        previewName.textContent = nameInput.value.trim() || 'Nombre del productor';
+        previewPlace.textContent = placeInput.value.trim() || 'Municipio';
+        previewDescription.textContent = descriptionInput.value.trim() || 'Productos frescos de temporada directamente del productor.';
+    }
+
+    [nameInput, placeInput, descriptionInput].forEach(function (input) {
+        input.addEventListener('input', syncPreview);
+    });
+});
+</script>

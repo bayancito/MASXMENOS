@@ -1,163 +1,213 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}
-Productores — MASXMENOS
+Productores - MASXMENOS
 {% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="{% static 'css/productores.css' %}">
 
-<header class="mxm-page-title d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3">
-    <div>
-        <h1 class="h3 mb-1">Productores registrados</h1>
-        <p class="text-secondary small mb-0">
-            Búsqueda, filtrado y listado de productores.
-        </p>
-    </div>
-    <div class="d-flex flex-wrap gap-2">
-        <a href="{% url 'mapa_productores' %}" class="btn btn-outline-success btn-sm">
-            Ver mapa
-        </a>
-        {% if user.is_authenticated and user.perfil.rol != 'COMPRADOR' %}
-            <a href="{% url 'crear_productor' %}" class="btn btn-success btn-sm">
-                Nuevo productor
+<section class="producer-directory">
+    <header class="producer-hero">
+        <div>
+            <h1>Productores y distribuidores</h1>
+            <p>Conoce a los productores locales que ofrecen productos frescos y de calidad.</p>
+        </div>
+
+        <div class="producer-hero-actions">
+            <a href="{% url 'mapa_productores' %}" class="producer-btn producer-btn-map">
+                <i class="bi bi-map"></i>
+                Ver mapa de productores
             </a>
-        {% endif %}
 
+            {% if puede_crear_productor %}
+                <a href="{% url 'crear_productor' %}" class="producer-btn producer-btn-create">
+                    <i class="bi bi-plus-lg"></i>
+                    Crear productor
+                </a>
+            {% endif %}
+        </div>
+    </header>
+
+    <form method="get" class="producer-filter-panel">
+        <div class="producer-search-field">
+            <i class="bi bi-search"></i>
+            <input
+                type="text"
+                id="busqueda"
+                name="q"
+                value="{{ busqueda }}"
+                placeholder="Buscar productor, comunidad o telefono..."
+            >
+        </div>
+
+        <select id="municipio" name="municipio" class="producer-select">
+            <option value="">Todas las comunidades</option>
+            {% for item in municipios %}
+                <option value="{{ item }}" {% if item == municipio_seleccionado %}selected{% endif %}>
+                    {{ item }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <select name="orden" class="producer-select">
+            <option value="nombre" {% if orden_seleccionado == 'nombre' %}selected{% endif %}>Orden alfabetico</option>
+            <option value="recientes" {% if orden_seleccionado == 'recientes' %}selected{% endif %}>Mas recientes</option>
+            <option value="productos" {% if orden_seleccionado == 'productos' %}selected{% endif %}>Mas productos</option>
+        </select>
+
+        <button type="submit" class="producer-filter-btn">
+            <i class="bi bi-funnel"></i>
+            Filtrar
+        </button>
+
+        <a href="{% url 'lista_productores' %}" class="producer-clear-btn">
+            <i class="bi bi-arrow-clockwise"></i>
+            Limpiar
+        </a>
+    </form>
+
+    <div class="producer-list-toolbar">
+        <p>Mostrando {{ productores|length }} de {{ productores.paginator.count }} productores</p>
+        <span>
+            {% if rol_usuario == 'ADMIN' %}
+                Vista administrador
+            {% elif rol_usuario == 'PRODUCTOR' %}
+                Gestiona solo tu cuenta
+            {% elif rol_usuario == 'COMPRADOR' %}
+                Vista comprador
+            {% else %}
+                Vista publica
+            {% endif %}
+        </span>
     </div>
-</header>
 
-<div class="card mb-4">
-    <div class="card-body">
-        <form method="get">
-            <div class="row g-3 align-items-end">
-                <div class="col-md-5">
-                    <label for="busqueda" class="form-label">Buscar</label>
-                    <input
-                        type="text"
-                        id="busqueda"
-                        name="q"
-                        value="{{ busqueda }}"
-                        class="form-control"
-                        placeholder="Nombre, comunidad o teléfono"
-                    >
-                </div>
-                <div class="col-md-4">
-                    <label for="municipio" class="form-label">Comunidad</label>
-                    <select id="municipio" name="municipio" class="form-select">
-                        <option value="">Todas las comunidades</option>
-                        {% for item in municipios %}
-                        <option
-                            value="{{ item }}"
-                            {% if item == municipio_seleccionado %}
-                            selected
-                            {% endif %}
-                        >
-                            {{ item }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <button type="submit" class="btn btn-success w-100">
-                        Aplicar
-                    </button>
-                </div>
-            </div>
-        </form>
-    </div>
-</div>
-
-<div class="table-responsive">
-    <table class="table table-striped table-bordered align-middle mb-0">
-
-        <thead class="table-light">
-            <tr>
-                <th scope="col">Nombre</th>
-                <th scope="col">Comunidad</th>
-                <th scope="col">Teléfono</th>
-                <th scope="col" class="text-center" style="width: 120px;">Productos</th>
-                <th scope="col" style="width: 180px;">Acciones</th>
-            </tr>
-        </thead>
-
-        <tbody>
-
+    {% if productores %}
+        <div class="producer-grid">
             {% for productor in productores %}
+                {% cycle 'img/plantacion.jpg' 'img/campo-trigo.jpg' 'img/cosecha.jpg' 'img/mercado.jpg' as producer_image silent %}
+                <article class="producer-card">
+                    <div class="producer-card-media">
+                        {% if productor.imagen_perfil %}
+                            <img src="{{ productor.imagen_perfil.url }}" alt="{{ productor.nombre_comercial }}">
+                        {% else %}
+                            <img src="{% static producer_image %}" alt="{{ productor.nombre_comercial }}">
+                        {% endif %}
+                        {% if productor.activo %}
+                            <span class="producer-verified">
+                                <i class="bi bi-patch-check"></i>
+                                Productor verificado
+                            </span>
+                        {% endif %}
+                    </div>
 
-            <tr>
-                <td>
-                    <a href="{% url 'detalle_productor' productor.id %}">
-                        {{ productor.nombre_comercial }}
+                    <div class="producer-avatar" aria-hidden="true">
+                        {{ productor.nombre_comercial|slice:":2"|upper }}
+                    </div>
+
+                    <div class="producer-card-body">
+                        <div class="producer-card-title-row">
+                            <h2>{{ productor.nombre_comercial }}</h2>
+                        </div>
+
+                        <p class="producer-location">
+                            <i class="bi bi-geo-alt"></i>
+                            {{ productor.municipio }}
+                        </p>
+
+                        <p class="producer-description">
+                            {% if productor.descripcion %}
+                                {{ productor.descripcion|truncatechars:86 }}
+                            {% elif productor.direccion %}
+                                {{ productor.direccion|truncatechars:86 }}
+                            {% else %}
+                                Productor local con productos frescos de temporada.
+                            {% endif %}
+                        </p>
+
+                        <div class="producer-tags">
+                            {% if productor.activo %}
+                                <span>Activo</span>
+                            {% else %}
+                                <span class="muted">Inactivo</span>
+                            {% endif %}
+                            <span>Comercio local</span>
+                        </div>
+                    </div>
+
+                    <div class="producer-card-footer">
+                        <div class="producer-stat">
+                            <i class="bi bi-basket"></i>
+                            {{ productor.num_productos }} productos
+                        </div>
+                        <div class="producer-stat">
+                            <i class="bi bi-telephone"></i>
+                            {{ productor.telefono|default:"Sin telefono" }}
+                        </div>
+                    </div>
+
+                    <div class="producer-card-actions {% if rol_usuario == 'ADMIN' or productor.usuario_id == user.id %}has-owner-actions{% endif %}">
+                        <a href="{% url 'detalle_productor' productor.id %}" class="producer-action-view">
+                            <i class="bi bi-eye"></i>
+                            Ver perfil
+                        </a>
+
+                        {% if rol_usuario == 'ADMIN' or productor.usuario_id == user.id %}
+                            <a href="{% url 'editar_productor' productor.pk %}" class="producer-action-edit">
+                                <i class="bi bi-pencil"></i>
+                                Editar
+                            </a>
+                            <a href="{% url 'eliminar_productor' productor.pk %}" class="producer-action-delete">
+                                <i class="bi bi-trash"></i>
+                                Eliminar
+                            </a>
+                        {% endif %}
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="producer-empty">
+            <i class="bi bi-search"></i>
+            <h2>No existen productores registrados</h2>
+            <p>Prueba con otra busqueda o limpia los filtros.</p>
+        </div>
+    {% endif %}
+
+    {% if productores.paginator.num_pages > 1 %}
+        <nav class="producer-pagination" aria-label="Paginacion de productores">
+            {% if productores.has_previous %}
+                <a href="?page={{ productores.previous_page_number }}{% if busqueda %}&amp;q={{ busqueda|urlencode }}{% endif %}{% if municipio_seleccionado %}&amp;municipio={{ municipio_seleccionado|urlencode }}{% endif %}{% if orden_seleccionado %}&amp;orden={{ orden_seleccionado|urlencode }}{% endif %}">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+            {% else %}
+                <span class="disabled">
+                    <i class="bi bi-chevron-left"></i>
+                </span>
+            {% endif %}
+
+            {% for page_num in productores.paginator.page_range %}
+                {% if page_num == productores.number %}
+                    <span class="active">{{ page_num }}</span>
+                {% else %}
+                    <a href="?page={{ page_num }}{% if busqueda %}&amp;q={{ busqueda|urlencode }}{% endif %}{% if municipio_seleccionado %}&amp;municipio={{ municipio_seleccionado|urlencode }}{% endif %}{% if orden_seleccionado %}&amp;orden={{ orden_seleccionado|urlencode }}{% endif %}">
+                        {{ page_num }}
                     </a>
-                </td>
-                <td>{{ productor.municipio }}</td>
-                <td>{{ productor.telefono }}</td>
-                <td class="text-center">
-                    {{ productor.num_productos }}
-                </td>
-                <td>
-                    <a
-                        href="{% url 'editar_productor' productor.pk %}"
-                        class="btn btn-sm btn-outline-primary"
-                    >
-                        Editar
-                    </a>
-                    <a
-                        href="{% url 'eliminar_productor' productor.pk %}"
-                        class="btn btn-sm btn-outline-danger"
-                    >
-                        Eliminar
-                    </a>
-                </td>
-            </tr>
-
-            {% empty %}
-
-            <tr>
-                <td colspan="5" class="text-center text-secondary py-4">
-                    No existen productores registrados.
-                </td>
-            </tr>
-
+                {% endif %}
             {% endfor %}
 
-        </tbody>
-
-    </table>
-</div>
-
-<nav class="mt-4" aria-label="Paginación de productores">
-    <ul class="pagination pagination-sm justify-content-center mb-0">
-
-        {% if productores.has_previous %}
-        <li class="page-item">
-            <a
-                class="page-link"
-                href="?page={{ productores.previous_page_number }}{% if busqueda %}&amp;q={{ busqueda|urlencode }}{% endif %}{% if municipio_seleccionado %}&amp;municipio={{ municipio_seleccionado|urlencode }}{% endif %}"
-            >
-                Anterior
-            </a>
-        </li>
-        {% endif %}
-
-        <li class="page-item active" aria-current="page">
-            <span class="page-link">
-                {{ productores.number }}
-            </span>
-        </li>
-
-        {% if productores.has_next %}
-        <li class="page-item">
-            <a
-                class="page-link"
-                href="?page={{ productores.next_page_number }}{% if busqueda %}&amp;q={{ busqueda|urlencode }}{% endif %}{% if municipio_seleccionado %}&amp;municipio={{ municipio_seleccionado|urlencode }}{% endif %}"
-            >
-                Siguiente
-            </a>
-        </li>
-        {% endif %}
-
-    </ul>
-</nav>
+            {% if productores.has_next %}
+                <a href="?page={{ productores.next_page_number }}{% if busqueda %}&amp;q={{ busqueda|urlencode }}{% endif %}{% if municipio_seleccionado %}&amp;municipio={{ municipio_seleccionado|urlencode }}{% endif %}{% if orden_seleccionado %}&amp;orden={{ orden_seleccionado|urlencode }}{% endif %}">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            {% else %}
+                <span class="disabled">
+                    <i class="bi bi-chevron-right"></i>
+                </span>
+            {% endif %}
+        </nav>
+    {% endif %}
+</section>
 
 {% endblock %}

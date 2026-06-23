@@ -1,81 +1,108 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Inicio — MASXMENOS{% endblock %}
+{% block title %}Inicio | MASXMENOS{% endblock %}
 
 {% block content %}
 
-<section class="arva-hero">
-    <video autoplay loop muted playsinline class="arva-hero-video">
-        <source src="{% static 'videos/videoaereo.mp4' %}" type="video/mp4">
-    </video>
-    
-    <div class="arva-hero-overlay"></div>
+<!-- CONTENEDOR BLANCO GIGANTE -->
+<div class="page-container">
 
-    <div class="container-xl position-relative z-2 h-100 d-flex flex-column justify-content-center align-items-center text-center">
-        <h1 class="arva-display text-white mb-4">
-            Cadenas de suministro justas<br>para un campo mejor
-        </h1>
-        <div class="d-flex flex-wrap justify-content-center gap-3 mt-4">
-           
+    <!-- NAVBAR INTEGRADO (Solo para el inicio) -->
+    <nav class="inicio-navbar">
+        <div class="inicio-logo">
+            🌱 MASXMENOS
         </div>
-        <div class="arva-scroll-cue text-white">
-            Explorar el proyecto <i class="bi bi-arrow-down"></i>
-        </div>
-    </div>
-</section>
+        
+        <ul class="inicio-menu">
+            <li><a href="{% url 'lista_productos' %}">Productos</a></li> 
+            <li><a href="{% url 'lista_productores' %}">Productores</a></li>
+            <li><a href="{% url 'mapa_productores' %}">Mercados</a></li>
+            <li><a href="#">Nosotros</a></li>
+            <li><a href="#explorar">Contacto</a></li>
+        </ul>
 
-<section class="arva-section py-5">
+        <div class="inicio-auth">
+            {% if user.is_authenticated %}
+                <a href="{% url 'perfil' %}" class="auth-btn login-btn">Mi perfil</a>
+                <form method="post" action="{% url 'logout' %}" style="margin:0;">
+                    {% csrf_token %}
+                    <button type="submit" class="auth-btn register-btn">Salir</button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}" class="auth-btn login-btn">Ingresar</a>
+                <a href="{% url 'registro' %}" class="auth-btn register-btn">Registrarse</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- ÁREA DEL VIDEO / IMAGEN -->
+    <section class="hero">
+                <img src="{% static 'img/campo-trigo.jpg' %}" alt="Alianza entre productores y compradores" class="hero-image">
+
+
+        <div class="overlay"></div>
+
+        <div class="hero-content">
+            <span class="tag">Marketplace Agrícola de Bolivia</span>
+            
+            <h1>Conectamos<br>productores y<br>compradores</h1>
+            
+            <p>Compra directamente del productor sin intermediarios. Encuentra mejores precios, productos frescos y oportunidades para crecer tu negocio.</p>
+            
+            <div class="hero-buttons">
+                <a href="{% url 'lista_productos' %}" class="primary-btn">Explorar productos &rarr;</a>
+                <a href="{% url 'lista_productores' %}" class="secondary-btn">Ser productor</a>
+            </div>
+        </div>
+
+        <!-- BOTÓN DESCUBRIR MÁS CON SCROLL -->
+        <a href="#explorar" class="scroll-btn">DESCUBRIR MÁS</a>
+    </section>
+
+</div>
+
+<!-- SECCIÓN DESTINO DEL SCROLL (MÁS COSAS ABAJO) -->
+<section id="explorar" style="padding: 100px 0; background-color: #f7f9f6;">
     <div class="container-xl">
-        <h2 class="arva-heading text-center mb-5">Explora nuestras cosechas</h2>
+        
+        <div style="text-align: center; margin-bottom: 60px;">
+            <span style="color: #2e7d32; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; font-size: 13px;">¿Cómo funciona?</span>
+            <h2 style="font-weight: 800; font-size: 38px; color: #111827; margin-top: 10px;">El comercio agrícola, simplificado</h2>
+            <p style="color: #6b7280; font-size: 18px; max-width: 600px; margin: 0 auto;">Una plataforma diseñada para hacer la intermediación más justa y transparente en Cochabamba.</p>
+        </div>
+
         <div class="row g-4">
+            <!-- Tarjeta 1 -->
             <div class="col-md-4">
-                <div class="arva-card bg-arva-sky text-center h-100">
-                    <h3 class="h5 fw-semibold mb-3">Frutas y Verduras</h3>
-                    <p class="small mb-0 arva-text-charcoal">Frescura garantizada directamente desde los valles de Cochabamba hasta tu mesa.</p>
+                <div style="background: white; padding: 40px 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); height: 100%; transition: transform 0.3s;">
+                    <div style="font-size: 32px; margin-bottom: 15px;">🔍</div>
+                    <h3 style="font-size: 20px; font-weight: 700; color: #111827;">1. Explora el mercado</h3>
+                    <p style="color: #4b5563; margin-top: 10px; line-height: 1.6;">Revisa el catálogo de productos frescos directamente desde nuestra red de productores locales validados.</p>
                 </div>
             </div>
+            
+            <!-- Tarjeta 2 -->
             <div class="col-md-4">
-                <div class="arva-card bg-arva-peach text-center h-100">
-                    <h3 class="h5 fw-semibold mb-3">Granos y Cereales</h3>
-                    <p class="small mb-0 arva-text-charcoal">Producción local esencial para la seguridad alimentaria de nuestra comunidad.</p>
+                <div style="background: white; padding: 40px 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); height: 100%; transition: transform 0.3s;">
+                    <div style="font-size: 32px; margin-bottom: 15px;">🤝</div>
+                    <h3 style="font-size: 20px; font-weight: 700; color: #111827;">2. Contacto directo</h3>
+                    <p style="color: #4b5563; margin-top: 10px; line-height: 1.6;">Comunícate sin intermediarios ocultos. Negocia precios justos que beneficien a ambas partes.</p>
                 </div>
             </div>
+
+            <!-- Tarjeta 3 -->
             <div class="col-md-4">
-                <div class="arva-card bg-arva-sage text-center h-100">
-                    <h3 class="h5 fw-semibold mb-3">Hierbas y Especias</h3>
-                    <p class="small mb-0 arva-text-charcoal">Aromas y sabores cultivados con métodos tradicionales y libres de agroquímicos.</p>
+                <div style="background: white; padding: 40px 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); height: 100%; transition: transform 0.3s;">
+                    <div style="font-size: 32px; margin-bottom: 15px;">🌱</div>
+                    <h3 style="font-size: 20px; font-weight: 700; color: #111827;">3. Impulsa el campo</h3>
+                    <p style="color: #4b5563; margin-top: 10px; line-height: 1.6;">Al comprar o vender en MASXMENOS, fortaleces la economía local y la seguridad alimentaria de tu región.</p>
                 </div>
             </div>
         </div>
+
     </div>
 </section>
 
-<section class="arva-forest-banner py-5 my-5">
-    <div class="container-xl py-4">
-        <div class="row gx-5 align-items-center">
-            <div class="col-lg-5 mb-4 mb-lg-0">
-                <h2 class="arva-heading text-white mb-4">Reconectando nuestro campo.</h2>
-                <p class="text-white opacity-75" style="max-width: 60ch;">
-                    Validando cómo una conexión directa y transparente puede transformar la manera en que adquirimos nuestros alimentos frescos de cada día en Cochabamba.
-                </p>
-            </div>
-            <div class="col-lg-6 offset-lg-1">
-                <div class="row g-4">
-                    <div class="col-sm-6">
-                        <div class="arva-icon-circle mb-3"><i class="bi bi-graph-down text-white"></i></div>
-                        <h4 class="text-white h6">Sin intermediarios</h4>
-                        <p class="text-white opacity-75 small">Precios justos para quien produce y para quien consume.</p>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="arva-icon-circle mb-3"><i class="bi bi-geo-alt text-white"></i></div>
-                        <h4 class="text-white h6">Impacto local</h4>
-                        <p class="text-white opacity-75 small">Apoyo directo a las familias agricultoras de nuestra región.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
 
 {% endblock %}

@@ -129,6 +129,80 @@ class Solicitud(models.Model):
         return f"Solicitud({self.id}) — {self.comprador.username} — {self.producto.nombre}"
 
 
+class Cosecha(models.Model):
+    UNIDAD_ARROBAS = "ARROBAS"
+    UNIDAD_LIBRAS = "LIBRAS"
+    UNIDAD_QUINTALES = "QUINTALES"
+
+    UNIDADES = [
+        (UNIDAD_ARROBAS, "arrobas"),
+        (UNIDAD_LIBRAS, "libras"),
+        (UNIDAD_QUINTALES, "quintales"),
+    ]
+
+    DISPONIBLE = "DISPONIBLE"
+    RESERVADA = "RESERVADA"
+    VENDIDA = "VENDIDA"
+
+    ESTADOS = [
+        (DISPONIBLE, "disponible"),
+        (RESERVADA, "reservada"),
+        (VENDIDA, "vendida"),
+    ]
+
+    productor = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="cosechas",
+    )
+
+    producto = models.ForeignKey(
+        Producto,
+        on_delete=models.CASCADE,
+        related_name="cosechas",
+    )
+
+    cantidad = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+    )
+
+    unidad_medida = models.CharField(
+        max_length=20,
+        choices=UNIDADES,
+    )
+
+    precio_esperado = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        help_text="Precio esperado en Bs. (moneda local)"
+    )
+
+    fecha_cosecha = models.DateField()
+
+    estado = models.CharField(
+        max_length=20,
+        choices=ESTADOS,
+        default=DISPONIBLE,
+    )
+
+    fotografia = models.ImageField(
+        upload_to="cosechas/",
+    )
+
+    fecha_creacion = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    class Meta:
+        verbose_name = "Cosecha"
+        verbose_name_plural = "Cosechas"
+        ordering = ["-fecha_creacion"]
+
+    def __str__(self):
+        return f"Cosecha({self.id}) — {self.producto.nombre} — {self.cantidad} {self.unidad_medida}"
+
+
 class Favorito(models.Model):
 
 

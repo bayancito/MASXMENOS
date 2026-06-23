@@ -12,6 +12,24 @@ from .forms import ProductorForm
 from apps.usuarios.decorators import es_productor_o_admin
 
 
+def _rol_usuario(user):
+    if not user.is_authenticated:
+        return None
+
+    perfil = getattr(user, 'perfil', None)
+    return getattr(perfil, 'rol', None)
+
+
+def _puede_crear_productor(user, rol):
+    if rol == 'ADMIN':
+        return True
+
+    if rol == 'PRODUCTOR':
+        return not Productor.objects.filter(usuario=user).exists()
+
+    return False
+
+
 
 
 
@@ -28,9 +46,14 @@ def lista_productores(request):
         ''
     )
 
+    orden = request.GET.get(
+        'orden',
+        'nombre'
+    )
+
     productores = Productor.objects.annotate(
         num_productos=Count('productos')
-    )
+    ).select_related('usuario')
 
     if busqueda:
 
@@ -46,6 +69,13 @@ def lista_productores(request):
             municipio=municipio
         )
 
+    if orden == 'recientes':
+        productores = productores.order_by('-fecha_creacion')
+    elif orden == 'productos':
+        productores = productores.order_by('-num_productos', 'nombre_comercial')
+    else:
+        productores = productores.order_by('nombre_comercial')
+
     municipios = Productor.objects.order_by(
         'municipio'
     ).values_list(
@@ -55,7 +85,7 @@ def lista_productores(request):
 
     paginator = Paginator(
         productores,
-        10
+        8
     )
 
     page_number = request.GET.get('page')
@@ -63,6 +93,8 @@ def lista_productores(request):
     productores = paginator.get_page(
         page_number
     )
+
+    rol_usuario = _rol_usuario(request.user)
 
     return render(
         request,
@@ -72,6 +104,12 @@ def lista_productores(request):
             'busqueda': busqueda,
             'municipios': municipios,
             'municipio_seleccionado': municipio,
+            'orden_seleccionado': orden,
+            'rol_usuario': rol_usuario,
+            'puede_crear_productor': _puede_crear_productor(
+                request.user,
+                rol_usuario
+            ),
         }
     )
 
@@ -94,22 +132,24 @@ def detalle_productor(request, pk):
     )
 
 
-from apps.usuarios.decorators import es_productor_o_admin
-
-
 @es_productor_o_admin
 def crear_productor(request):
 
-
-
-
     if request.method == 'POST':
 
-        form = ProductorForm(request.POST)
+        form = ProductorForm(
+            request.POST,
+            request.FILES
+        )
 
         if form.is_valid():
 
-            form.save()
+            productor = form.save(commit=False)
+
+            if request.user.perfil.rol != 'ADMIN':
+                productor.usuario = request.user
+
+            productor.save()
 
             return redirect(
                 'lista_productores'
@@ -123,7 +163,8 @@ def crear_productor(request):
         request,
         'productores/crear_productor.html',
         {
-            'form': form
+            'form': form,
+            'modo_formulario': 'crear'
         }
     )
 
@@ -146,12 +187,18 @@ def editar_productor(request, pk):
 
         form = ProductorForm(
             request.POST,
+            request.FILES,
             instance=productor
         )
 
         if form.is_valid():
 
-            form.save()
+            productor = form.save(commit=False)
+
+            if rol != 'ADMIN':
+                productor.usuario = request.user
+
+            productor.save()
 
             return redirect(
                 'detalle_productor',
@@ -169,10 +216,12 @@ def editar_productor(request, pk):
         'productores/editar_productor.html',
         {
             'form': form,
-            'productor': productor
+            'productor': productor,
+            'modo_formulario': 'editar'
         }
     )
 
+@es_productor_o_admin
 def eliminar_productor(request, pk):
 
     productor = get_object_or_404(

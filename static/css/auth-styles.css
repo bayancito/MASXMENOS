@@ -1,0 +1,333 @@
+/* ========================================
+   ESTILOS PERSONALIZABLES PARA LOGIN/REGISTRO
+   Cambia estas variables para personalizar
+   ======================================== */
+
+:root {
+    /* ============================================
+       PERSONALIZACIÓN DE IMÁGENES Y COLORES
+       Modifica aquí para cambiar el diseño
+       ============================================ */
+    
+    /* COLORES DEL GRADIENTE DE FONDO */
+    --bg-gradient-1: #a855f7;
+    --bg-gradient-2: #ec4899;
+    --bg-gradient-3: #f97316;
+    
+    /* 🖼️  IMAGEN DE FONDO DEL CUERPO
+       Cambiar aquí: reemplaza la URL con tu imagen
+       Ubicación actual: static/img/plantacion.jpg
+       Ej: url('/static/img/otra-imagen.jpg') */
+    --bg-image: url('/static/img/plantacion.jpg');
+    --bg-image-size: cover;
+    --bg-image-position: center;
+    
+    /* 🖼️  IMAGEN DEL PANEL IZQUIERDO (lado con título y redes)
+       Cambiar aquí: reemplaza la URL con tu imagen
+       Ubicación actual: static/img/cosecha.jpg
+       Ej: url('/static/img/otra-imagen.jpg') */
+    --left-panel-bg-image: url('/static/img/cosecha.jpg');
+    --left-panel-bg-size: cover;
+    --left-panel-bg-position: center;
+    
+    /* COLORES GENERALES */
+    --accent-color: #3b82f6;
+    --accent-hover: #2563eb;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 50%, var(--bg-gradient-3) 100%);
+    background-image: var(--bg-image);
+    background-size: var(--bg-image-size);
+    background-position: var(--bg-image-position);
+    background-attachment: fixed;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* Efecto de líneas de fondo */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        linear-gradient(45deg, transparent 48%, rgba(255, 255, 255, 0.05) 49%, rgba(255, 255, 255, 0.05) 51%, transparent 52%);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.auth-container {
+    position: relative;
+    z-index: 10;
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    display: flex;
+    width: 90%;
+    max-width: 1000px;
+    min-height: 600px;
+    animation: slideIn 0.6s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.auth-left {
+    flex: 1;
+    background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 50%, var(--bg-gradient-3) 100%);
+    background-image: var(--left-panel-bg-image);
+    background-size: var(--left-panel-bg-size);
+    background-position: var(--left-panel-bg-position);
+    background-blend-mode: overlay;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    padding: 60px 40px;
+    position: relative;
+    overflow: hidden;
+}
+
+.auth-left::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="%23ffffff" opacity="0.1"/><circle cx="80" cy="80" r="2" fill="%23ffffff" opacity="0.1"/></svg>');
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.auth-left-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+}
+
+.auth-left h1 {
+    font-size: 72px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    line-height: 1;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.auth-left p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 30px;
+    opacity: 0.95;
+    max-width: 400px;
+}
+
+.social-links {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.social-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid white;
+    color: white;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.social-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.auth-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px 50px;
+    background: white;
+    overflow-y: auto;
+    max-height: 600px;
+}
+
+.auth-right h2 {
+    font-size: 36px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 14px 16px;
+    border: none;
+    border-bottom: 2px solid #e5e7eb;
+    font-size: 15px;
+    color: #1f2937;
+    transition: border-color 0.3s ease;
+    background: transparent;
+    font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-bottom-color: var(--accent-color);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: #9ca3af;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-hover) 100%);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+.auth-link {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.auth-link a {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.auth-link a:hover {
+    color: var(--accent-hover);
+    text-decoration: underline;
+}
+
+/* Mensajes de error */
+.error-message {
+    background: #fee2e2;
+    color: #dc2626;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    border-left: 4px solid #dc2626;
+}
+
+/* Mensajes de éxito */
+.success-message {
+    background: #dcfce7;
+    color: #16a34a;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    border-left: 4px solid #16a34a;
+}
+
+/* Mensajes generales */
+.info-message {
+    background: #dbeafe;
+    color: #1e40af;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    border-left: 4px solid #1e40af;
+}
+
+@media (max-width: 768px) {
+    .auth-container {
+        flex-direction: column;
+        min-height: auto;
+        width: 95%;
+    }
+
+    .auth-left {
+        padding: 40px 30px;
+        min-height: 300px;
+    }
+
+    .auth-left h1 {
+        font-size: 48px;
+    }
+
+    .auth-right {
+        padding: 40px 30px;
+        max-height: none;
+    }
+
+    .auth-right h2 {
+        font-size: 28px;
+    }
+
+    .social-links {
+        flex-wrap: wrap;
+    }
+}

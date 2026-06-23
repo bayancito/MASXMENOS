@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Categoria, Producto, Solicitud
+from .models import Categoria, Producto, Solicitud, Cosecha
+
 
 
 
@@ -79,3 +80,30 @@ class ProductoAdmin(admin.ModelAdmin):
             'fields': ('productor',)
         }),
     )
+
+
+@admin.register(Cosecha)
+class CosechaAdmin(admin.ModelAdmin):
+
+    list_display = (
+        'id',
+        'producto',
+        'productor',
+        'cantidad',
+        'unidad_medida',
+        'precio_esperado',
+        'fecha_cosecha',
+        'estado',
+        'fecha_creacion',
+    )
+
+    search_fields = (
+        'producto__nombre',
+        'productor__username',
+    )
+
+    list_filter = (
+        'estado',
+        'fecha_cosecha',
+    )
+

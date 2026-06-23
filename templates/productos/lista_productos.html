@@ -1,151 +1,301 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Productos — MASXMENOS{% endblock %}
+{% block title %}Catálogo de Productos — MASXMENOS{% endblock %}
 
 {% block content %}
-<div class="container-xl pt-4 pb-5">
-    
-    <header class="d-flex justify-content-between align-items-center mb-4">
-        <p class="text-secondary small mb-0">
-            Mostrando <span class="fw-bold text-dark">{{ productos|length }}</span> productos
-        </p>
-        {% if user.is_authenticated and user.perfil.rol != 'COMPRADOR' %}
-            <a href="{% url 'crear_producto' %}" class="btn btn-success btn-sm px-4 py-2" style="background-color: #2F432B; border: none;">
-                Nuevo producto
-            </a>
-        {% endif %}
-    </header>
+<link rel="stylesheet" href="{% static 'css/catalogo.css' %}">
 
-    <div class="row g-5">
-        
-        <div class="col-lg-3">
-            <div class="agro-card p-4 sticky-lg-top" style="top: 100px;">
-                <div class="d-flex align-items-center gap-2 mb-4 border-bottom pb-3">
-                    <i class="bi bi-sliders text-dark"></i>
-                    <h2 class="h6 fw-bold text-dark mb-0">Filtros</h2>
+<body class="catalogo-page">
+    <!-- HEADER CON BÚSQUEDA -->
+    <div class="catalogo-header">
+        <div class="container-fluid" style="max-width: 1400px; margin: 0 auto; padding: 0 2rem;">
+            <div class="catalogo-header-content">
+                <div class="catalogo-search-box">
+                    <form method="get" style="display: flex; gap: 0.5rem; flex: 1;">
+                        <input 
+                            type="text" 
+                            name="q" 
+                            value="{{ busqueda }}" 
+                            placeholder="Buscar productos, productores, certificaciones..."
+                            class="form-control"
+                        >
+                        <button type="submit" class="catalogo-search-btn">
+                            <i class="bi bi-search"></i>
+                            Buscar
+                        </button>
+                    </form>
+                </div>
+                
+                <button class="catalogo-location-btn">
+                    <i class="bi bi-geo-alt"></i>
+                    Todo México
+                </button>
+
+                <div class="catalogo-action-btns">
+                    {% if user.is_authenticated %}
+                        <button class="catalogo-btn-secondary">
+                            {% if user.perfil.rol != 'COMPRADOR' %}
+                                <a href="{% url 'crear_producto' %}" style="text-decoration: none; color: inherit;">
+                                    <i class="bi bi-plus-circle"></i> Soy productor
+                                </a>
+                            {% else %}
+                                <a href="{% url 'dashboard_comprador' %}" style="text-decoration: none; color: inherit;">
+                                    Dashboard
+                                </a>
+                            {% endif %}
+                        </button>
+                    {% else %}
+                        <button class="catalogo-btn-secondary" onclick="mostrarModalLogin()">
+                            Soy productor
+                        </button>
+                        <a href="{% url 'login' %}" class="catalogo-btn-secondary">Iniciar sesión</a>
+                    {% endif %}
                 </div>
 
-                <form method="get">
-                    <div class="mb-4">
-                        <label for="categoria" class="form-label fw-semibold text-dark" style="font-size: 0.85rem;">Categoría</label>
-                        <select id="categoria" name="categoria" class="form-select border-light-subtle text-secondary bg-light" style="font-size: 0.9rem;">
-                            <option value="">Todas las categorías</option>
-                            {% for categoria in categorias %}
-                                <option value="{{ categoria.id }}" {% if categoria.id|stringformat:"s" == categoria_seleccionada %}selected{% endif %}>
-                                    {{ categoria.nombre }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </div>
+                <i class="bi bi-bag-fill catalogo-cart-icon" style="display: none;">
+                    <span class="catalogo-cart-badge" style="display: none;">0</span>
+                </i>
+            </div>
 
-                    <div class="mb-4">
-                        <label for="busqueda" class="form-label fw-semibold text-dark" style="font-size: 0.85rem;">Buscar producto</label>
-                        <input type="text" id="busqueda" name="q" value="{{ busqueda }}" class="form-control border-light-subtle text-secondary bg-light" placeholder="Ej. Tomate..." style="font-size: 0.9rem;">
-                    </div>
-
-                    <button type="submit" class="btn w-100 py-2 mb-2 text-white" style="background-color: #2F432B; font-size: 0.9rem; font-weight: 500; border-radius: 0.5rem;">
-                        Aplicar
-                    </button>
-                    <a href="{% url 'lista_productos' %}" class="btn w-100 py-2 text-secondary" style="font-size: 0.9rem;">
-                        Limpiar filtros
+            <!-- CATEGORÍAS HORIZONTALES -->
+            <div class="catalogo-categories">
+                <a href="{% url 'lista_productos' %}" class="catalogo-category-chip {% if not categoria_seleccionada %}active{% endif %}">
+                    <i class="bi bi-grid-3x3-gap"></i> Todos
+                </a>
+                {% for categoria in categorias %}
+                    <a href="?categoria={{ categoria.id }}" class="catalogo-category-chip {% if categoria.id|stringformat:'s' == categoria_seleccionada %}active{% endif %}">
+                        {{ categoria.nombre }}
                     </a>
-                </form>
+                {% endfor %}
             </div>
         </div>
+    </div>
 
-        <div class="col-lg-9">
+    <!-- CONTENIDO PRINCIPAL -->
+    <div class="catalogo-main-container">
+        
+        <!-- SIDEBAR FILTROS -->
+        <aside class="catalogo-filters">
+            <div class="catalogo-filters-title">
+                <i class="bi bi-sliders"></i>
+                Filtros
+            </div>
+
+            <form method="get" id="filtros-form">
+                <!-- Búsqueda -->
+                <div class="catalogo-filter-section">
+                    <label class="catalogo-filter-label">Buscar</label>
+                    <input 
+                        type="text" 
+                        name="q" 
+                        value="{{ busqueda }}"
+                        class="catalogo-filter-input" 
+                        placeholder="Producto..."
+                    >
+                </div>
+
+                <!-- Categoría -->
+                <div class="catalogo-filter-section">
+                    <label class="catalogo-filter-label">Categoría</label>
+                    <select name="categoria" class="catalogo-filter-input">
+                        <option value="">Todas</option>
+                        {% for categoria in categorias %}
+                            <option value="{{ categoria.id }}" {% if categoria.id|stringformat:"s" == categoria_seleccionada %}selected{% endif %}>
+                                {{ categoria.nombre }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Acciones -->
+                <div class="catalogo-filter-actions">
+                    <button type="submit" class="catalogo-filter-btn catalogo-filter-apply">
+                        Aplicar Filtros
+                    </button>
+                    <a href="{% url 'lista_productos' %}" class="catalogo-filter-btn catalogo-filter-clear">
+                        Limpiar
+                    </a>
+                </div>
+            </form>
+        </aside>
+
+        <!-- GRID DE PRODUCTOS -->
+        <div class="catalogo-products">
+            
+            <!-- ENCABEZADO DE PRODUCTOS -->
+            <div class="catalogo-products-header">
+                <div class="catalogo-products-count">
+                    Mostrando <strong>{{ productos|length }}</strong> productos
+                </div>
+                <div class="catalogo-sort-wrapper">
+                    <label class="catalogo-sort-label">Ordenar por:</label>
+                    <select class="catalogo-sort-select">
+                        <option>Relevancia</option>
+                        <option>Precio: menor a mayor</option>
+                        <option>Precio: mayor a menor</option>
+                        <option>Más recientes</option>
+                    </select>
+                </div>
+            </div>
+
             {% if productos %}
-                <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+                <!-- GRID DE CARDS -->
+                <div class="catalogo-grid">
                     {% for producto in productos %}
-                        <div class="col">
-                            
-                            <a href="{% url 'detalle_producto' producto.id %}" class="agro-card-link">
-                                
-                                <article class="agro-card h-100 d-flex flex-column position-relative">
+                        <div class="catalogo-product-card">
+                            <a href="{% url 'detalle_producto' producto.id %}">
+                                <!-- IMAGEN -->
+                                <div class="catalogo-product-image">
+                                    {% if producto.imagen %}
+                                        <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+                                    {% else %}
+                                        <div class="catalogo-product-no-image">
+                                            <i class="bi bi-image"></i>
+                                        </div>
+                                    {% endif %}
                                     
-                                    <div class="position-relative bg-light" style="height: 200px; border-top-left-radius: 1rem; border-top-right-radius: 1rem; overflow: hidden;">
-                                        {% if producto.imagen %}
-                                            <img src="{{ producto.imagen.url }}" class="w-100 h-100 object-fit-cover" alt="{{ producto.nombre }}">
-                                        {% else %}
-                                            <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-white">
-                                                <i class="bi bi-image text-muted fs-1 opacity-25"></i>
-                                            </div>
-                                        {% endif %}
-                                        
-                                        <div class="position-absolute top-0 start-0 m-3">
-                                            {% if producto.activo %}
-                                               <span style="background-color: #FEF3C7 !important; color: #92400E !important; padding: 6px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; text-decoration: none !important; display: inline-block;">
-                                                Disponible
-                                                 </span>
+                                    <!-- BADGE DISPONIBILIDAD -->
+                                    {% if producto.activo %}
+                                        <div class="catalogo-product-badge available">
+                                            ✓ En temporada
+                                        </div>
+                                    {% endif %}
+                                </div>
 
-                                            {% endif %}
+                                <!-- CONTENIDO -->
+                                <div class="catalogo-product-content">
+                                    <!-- TÍTULO -->
+                                    <h3 class="catalogo-product-title">{{ producto.nombre }}</h3>
+
+                                    <!-- PRECIO -->
+                                    <div class="catalogo-product-price">
+                                        <span class="catalogo-product-price-amount">
+                                            $ {{ producto.precio }}
+                                        </span>
+                                        <span class="catalogo-product-price-unit">/ unidad</span>
+                                    </div>
+
+                                    <!-- INFO TABLA -->
+                                    <div class="catalogo-product-info">
+                                        <div class="catalogo-product-info-item">
+                                            <span class="catalogo-product-info-label">Categoría</span>
+                                            <span class="catalogo-product-info-value">
+                                                {% if producto.categoria %}{{ producto.categoria }}{% else %}—{% endif %}
+                                            </span>
+                                        </div>
+                                        <div class="catalogo-product-info-item">
+                                            <span class="catalogo-product-info-label">Stock</span>
+                                            <span class="catalogo-product-info-value">
+                                                {% if producto.activo %}Disponible{% else %}Agotado{% endif %}
+                                            </span>
                                         </div>
                                     </div>
 
-                                    <div class="p-4 d-flex flex-column flex-grow-1 bg-white" style="border-bottom-left-radius: 1rem; border-bottom-right-radius: 1rem;">
-                                        
-                                        <h3 class="fw-semibold mb-2 lh-sm" style="font-size: 1.05rem; color: #152013 !important; text-decoration: none !important;">
-                                            {{ producto.nombre }}
-                                        </h3>
-                                        
-                                       <div class="d-flex align-items-baseline gap-1 mb-4">
-                                            <span class="fs-3 fw-bold" style="color: #152013 !important; text-decoration: none !important;">
-                                                Bs. {{ producto.precio }}
-                                            </span>
-                                            <span style="font-size: 0.85rem; color: #64748B !important; text-decoration: none !important; font-weight: 500;">
-                                                / unidad
-                                            </span>
+                                    <!-- PRODUCTOR -->
+                                    <div class="catalogo-product-producer">
+                                        <div class="catalogo-producer-avatar">
+                                            <i class="bi bi-person-fill"></i>
                                         </div>
-
-                                        <div class="row g-2 mb-4" style="font-size: 0.8rem;">
-                                            <div class="col-6">
-                                                <span class="d-block text-secondary">Categoría</span>
-                                                <span class="fw-medium text-dark text-truncate d-block">
-                                                    {% if producto.categoria %}{{ producto.categoria }}{% else %}—{% endif %}
-                                                </span>
+                                        <div class="catalogo-producer-info">
+                                            <div class="catalogo-producer-name">
+                                                {% if producto.productor %}{{ producto.productor }}{% else %}Anónimo{% endif %}
+                                                <i class="bi bi-patch-check-fill" style="color: #0369a1; font-size: 0.7rem;"></i>
                                             </div>
-                                            <div class="col-6">
-                                                <span class="d-block text-secondary">Estado</span>
-                                                <span class="fw-medium text-dark text-truncate d-block">Activo</span>
-                                            </div>
-                                        </div>
-
-                                        <div class="mt-auto pt-3 border-top border-light-subtle d-flex align-items-center justify-content-between">
-                                            <div class="d-flex align-items-center gap-2">
-                                                <div class="rounded-circle bg-light border d-flex align-items-center justify-content-center text-secondary" style="width: 32px; height: 32px;">
-                                                    <i class="bi bi-person-fill"></i>
-                                                </div>
-                                                <div class="lh-1">
-                                                    <div class="d-flex align-items-center gap-1 mb-1">
-                                                        <span class="fw-medium text-dark text-truncate" style="font-size: 0.8rem; max-width: 100px;">
-                                                            {% if producto.productor %}{{ producto.productor }}{% else %}Anónimo{% endif %}
-                                                        </span>
-                                                        <i class="bi bi-patch-check-fill text-primary" style="font-size: 0.7rem;"></i>
-                                                    </div>
-                                                    <div class="text-secondary d-flex align-items-center gap-1" style="font-size: 0.7rem;">
-                                                        <i class="bi bi-geo-alt"></i> Cochabamba
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="agro-plus-btn">
-                                                <i class="bi bi-plus"></i>
+                                            <div class="catalogo-producer-location">
+                                                <i class="bi bi-geo-alt"></i> Cochabamba
                                             </div>
                                         </div>
                                     </div>
-                                </article>
+                                </div>
                             </a>
+
+                            <!-- ACCIONES -->
+                            <div class="catalogo-product-actions" style="padding: 0 1.25rem 1.25rem;">
+                                {% if user.is_authenticated %}
+                                    <button class="catalogo-action-btn catalogo-btn-add" onclick="agregarAlCarrito({{ producto.id }})">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+                                    <button class="catalogo-action-btn catalogo-btn-icon" onclick="agregarAFavoritos({{ producto.id }})" title="Agregar a favoritos">
+                                        <i class="bi bi-heart"></i>
+                                    </button>
+                                {% else %}
+                                    <button class="catalogo-action-btn catalogo-btn-add" onclick="mostrarModalLogin()">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+                                    <button class="catalogo-action-btn catalogo-btn-icon" onclick="mostrarModalLogin()" title="Agregar a favoritos">
+                                        <i class="bi bi-heart"></i>
+                                    </button>
+                                {% endif %}
                             </div>
+                        </div>
                     {% endfor %}
                 </div>
             {% else %}
-                <div class="agro-card p-5 text-center bg-white border-light-subtle">
-                    <h3 class="h6 fw-semibold text-dark">No se encontraron productos</h3>
-                    <p class="text-secondary small">Intenta buscar con otros términos o limpia los filtros.</p>
+                <div class="catalogo-empty">
+                    <div class="catalogo-empty-icon">
+                        <i class="bi bi-search"></i>
+                    </div>
+                    <h3 class="catalogo-empty-title">No se encontraron productos</h3>
+                    <p class="catalogo-empty-desc">Intenta buscar con otros términos o limpia los filtros.</p>
                 </div>
             {% endif %}
         </div>
     </div>
+
+    <!-- MODAL AUTENTICACIÓN -->
+<div class="catalogo-auth-modal" id="authModal">
+    <div class="catalogo-modal-content" style="position: relative;">
+        <button class="catalogo-modal-close" onclick="cerrarModalLogin()">
+            <i class="bi bi-x"></i>
+        </button>
+        
+        <div class="catalogo-modal-icon">
+            <i class="bi bi-lock"></i>
+        </div>
+        
+        <h2 class="catalogo-modal-title">Inicia sesión para continuar</h2>
+        
+        <p class="catalogo-modal-desc">
+            Necesitas una cuenta para agregar productos al carrito, guardar favoritos y hacer solicitudes.
+        </p>
+        
+        <div class="catalogo-modal-actions">
+            <a href="{% url 'login' %}" class="catalogo-modal-btn catalogo-modal-btn-primary">
+                Iniciar Sesión
+            </a>
+            <a href="{% url 'registro' %}" class="catalogo-modal-btn catalogo-modal-btn-secondary">
+                Registrarse
+            </a>
+        </div>
+    </div>
 </div>
+
+<script>
+function mostrarModalLogin() {
+    document.getElementById('authModal').classList.add('active');
+}
+
+function cerrarModalLogin() {
+    document.getElementById('authModal').classList.remove('active');
+}
+
+function agregarAlCarrito(productoId) {
+    alert('Carrito: Producto ' + productoId);
+}
+
+function agregarAFavoritos(productoId) {
+    alert('Favorito: Producto ' + productoId);
+}
+
+// Cerrar modal al hacer click fuera
+document.getElementById('authModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        cerrarModalLogin();
+    }
+});
+</script>
+
+</body>
+
 {% endblock %}

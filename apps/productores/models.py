@@ -27,12 +27,22 @@ class Productor(models.Model):
         max_length=100
     )
 
+    descripcion = models.TextField(
+        blank=True
+    )
+
+    imagen_perfil = models.ImageField(
+        upload_to='productores/',
+        blank=True,
+        null=True
+    )
+
     latitud = models.DecimalField(
-    max_digits=9,
-    decimal_places=6,
-    null=True,
-    blank=True
-)
+        max_digits=9,
+        decimal_places=6,
+        null=True,
+        blank=True
+    )
 
     longitud = models.DecimalField(
         max_digits=9,

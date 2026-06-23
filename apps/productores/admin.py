@@ -14,5 +14,23 @@ class ProductorAdmin(admin.ModelAdmin):
 
     search_fields = (
         'nombre_comercial',
+        'municipio',
+        'descripcion'
+    )
+
+    list_filter = (
+        'activo',
         'municipio'
+    )
+
+    fieldsets = (
+        ('Informacion principal', {
+            'fields': ('usuario', 'nombre_comercial', 'telefono', 'municipio', 'direccion')
+        }),
+        ('Perfil publico', {
+            'fields': ('descripcion', 'imagen_perfil', 'activo')
+        }),
+        ('Ubicacion', {
+            'fields': ('latitud', 'longitud')
+        }),
     )

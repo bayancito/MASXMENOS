@@ -1,26 +1,13 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}
-Editar productor
+Editar productor - MASXMENOS
 {% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="{% static 'css/productores.css' %}">
 
-<h1>Editar productor</h1>
-
-<form method="post">
-
-    {% csrf_token %}
-
-    {{ form.as_p }}
-
-    <button
-        type="submit"
-        class="btn btn-success"
-    >
-        Guardar cambios
-    </button>
-
-</form>
+{% include 'productores/_form_productor.html' %}
 
 {% endblock %}

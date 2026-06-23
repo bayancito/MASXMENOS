@@ -11,6 +11,18 @@ urlpatterns = [
     ),
 
     path(
+        'incidencias/',
+        views.incidencia_list,
+        name='incidencias_list',
+    ),
+
+    path(
+        'incidencias/nueva/',
+        views.crear_incidencia,
+        name='incidencias_nueva',
+    ),
+
+    path(
         'excel/productos/',
         views.exportar_productos_excel,
         name='excel_productos'

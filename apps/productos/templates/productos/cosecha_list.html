@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-12">
+      <h2 class="mb-3">Mis Cosechas</h2>
+
+      <div class="mb-3">
+        <a href="{% url 'crear_cosecha' %}" class="btn btn-primary">Nueva Cosecha</a>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-striped align-middle">
+          <thead>
+            <tr>
+              <th scope="col">Producto</th>
+              <th scope="col">Cantidad</th>
+              <th scope="col">Unidad</th>
+              <th scope="col">Precio esperado</th>
+              <th scope="col">Fecha cosecha</th>
+              <th scope="col">Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if cosechas %}
+              {% for cosecha in cosechas %}
+                <tr>
+                  <td>
+                    <a href="{% url 'detalle_producto' cosecha.producto_id %}">
+                      {{ cosecha.producto.nombre }}
+                    </a>
+                  </td>
+                  <td>{{ cosecha.cantidad }}</td>
+                  <td>{{ cosecha.unidad_medida }}</td>
+                  <td>{{ cosecha.precio_esperado }}</td>
+                  <td>{{ cosecha.fecha_cosecha }}</td>
+                  <td>{{ cosecha.estado }}</td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="6" class="text-center text-muted">
+                  No tienes cosechas registradas.
+                </td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+
+      {% if cosechas %}
+        <div class="d-flex justify-content-end mt-3">
+          <!-- Placeholder simple para paginación si más adelante se agrega -->
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

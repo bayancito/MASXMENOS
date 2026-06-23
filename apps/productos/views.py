@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
+from django.views.decorators.http import require_POST
 
 from apps.usuarios.decorators import es_productor_o_admin
 
-from .forms import ProductoForm, SolicitudForm
-from .models import Producto, Categoria, Favorito, Solicitud
+from .forms import ProductoForm, SolicitudForm, CosechaForm
+from .models import Producto, Categoria, Favorito, Solicitud, Cosecha
 
 
 @es_productor_o_admin
@@ -206,6 +207,7 @@ def dashboard_productor(request):
     )
 
 
+@require_POST
 def aceptar_solicitud(request, pk):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -224,6 +226,7 @@ def aceptar_solicitud(request, pk):
     return redirect('solicitudes_recibidas')
 
 
+@require_POST
 def rechazar_solicitud(request, pk):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -279,12 +282,123 @@ def dashboard_comprador(request):
     )
 
 
-def solicitar_producto(request, pk):
+def _get_cosecha_owner_or_403(request, cosecha):
+    """
+    Retorna la cosecha si el usuario es propietario; si no, 403.
+    """
     if not request.user.is_authenticated or not hasattr(request.user, "perfil"):
-        return redirect('detalle_producto', pk=pk)
+        return None
 
+    rol = request.user.perfil.rol
+    if rol != "PRODUCTOR":
+        return None
+
+    if cosecha.productor != request.user:
+        from django.http import HttpResponseForbidden
+        return HttpResponseForbidden("No tienes permiso para acceder a esta cosecha.")
+
+    return None
+
+
+def crear_cosecha(request):
+    if not request.user.is_authenticated or not hasattr(request.user, "perfil"):
+        return redirect('inicio')
+
+    if request.user.perfil.rol != "PRODUCTOR":
+        return redirect('inicio')
+
+    if request.method == "POST":
+        form = CosechaForm(request.POST, request.FILES)
+        if form.is_valid():
+            cosecha = form.save(commit=False)
+            cosecha.productor = request.user
+            cosecha.save()
+            return redirect("mis_cosechas")
+    else:
+        form = CosechaForm()
+
+    return render(
+        request,
+        "productos/cosecha_form.html",
+        {
+            "form": form,
+        },
+    )
+
+
+def mis_cosechas(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    if not hasattr(request.user, "perfil") or request.user.perfil.rol != "PRODUCTOR":
+        return redirect('inicio')
+
+    cosechas = Cosecha.objects.filter(productor=request.user).order_by("-fecha_creacion")
+
+    return render(
+        request,
+        "productos/cosecha_list.html",
+        {
+            "cosechas": cosechas,
+        },
+    )
+
+
+def editar_cosecha(request, pk):
+    cosecha = get_object_or_404(Cosecha, pk=pk)
+
+    if not request.user.is_authenticated or not hasattr(request.user, "perfil"):
+        from django.http import HttpResponseForbidden
+        return HttpResponseForbidden("No autorizado.")
+
+    if request.user.perfil.rol != "PRODUCTOR" or cosecha.productor != request.user:
+        from django.http import HttpResponseForbidden
+        return HttpResponseForbidden("No tienes permiso para editar esta cosecha.")
+
+    if request.method == "POST":
+        form = CosechaForm(request.POST, request.FILES, instance=cosecha)
+        if form.is_valid():
+            form.save()
+            return redirect("mis_cosechas")
+    else:
+        form = CosechaForm(instance=cosecha)
+
+    return render(
+        request,
+        "productos/cosecha_form.html",
+        {
+            "form": form,
+            "cosecha": cosecha,
+        },
+    )
+
+
+def eliminar_cosecha(request, pk):
+    cosecha = get_object_or_404(Cosecha, pk=pk)
+
+    if not request.user.is_authenticated or not hasattr(request.user, "perfil"):
+        from django.http import HttpResponseForbidden
+        return HttpResponseForbidden("No autorizado.")
+
+    if request.user.perfil.rol != "PRODUCTOR" or cosecha.productor != request.user:
+        from django.http import HttpResponseForbidden
+        return HttpResponseForbidden("No tienes permiso para eliminar esta cosecha.")
+
+    if request.method == "POST":
+        cosecha.delete()
+        return redirect("mis_cosechas")
+
+    # No existe plantilla de confirmación en el repo; evita error por template faltante.
+
+
+def solicitar_producto(request, pk):
+    # VISITANTE: redirigir a login si intenta comprar
+    if not request.user.is_authenticated or not hasattr(request.user, "perfil"):
+        return redirect('login')
+
+    # COMPRADOR solamente
     if request.user.perfil.rol != "COMPRADOR":
-        return redirect('detalle_producto', pk=pk)
+        return redirect('login')
 
     producto = get_object_or_404(Producto, pk=pk)
 
