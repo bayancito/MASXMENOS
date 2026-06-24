@@ -1,28 +1,115 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}
-Editar Producto
+Editar Producto - MASXMENOS
 {% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="{% static 'css/catalogo.css' %}">
 
-<h2>Editar Producto</h2>
+<section class="product-form-page">
+    <header class="product-form-header">
+        <div>
+            <p class="product-form-kicker">Gestion de producto</p>
+            <h1>Editar {{ producto.nombre }}</h1>
+            <p>Actualiza los datos principales y agrega nuevas fotos a la galeria del producto.</p>
+        </div>
+        <a href="{% url 'detalle_producto' producto.id %}" class="product-form-back">
+            <i class="bi bi-arrow-left"></i>
+            Volver al detalle
+        </a>
+    </header>
 
-<form method="post"
-      enctype="multipart/form-data">
+    <form method="post" enctype="multipart/form-data" class="product-editor-card">
+        {% csrf_token %}
 
-    {% csrf_token %}
+        {% if form.errors %}
+            <div class="product-form-alert">
+                Revisa los campos marcados antes de actualizar.
+            </div>
+        {% endif %}
 
-    {{ form.as_p }}
+        <div class="product-editor-grid">
+            <div class="product-form-panel">
+                <h2>Informacion del producto</h2>
 
-    <button
-        type="submit"
-        class="btn btn-warning">
+                <div class="product-field">
+                    <label for="{{ form.nombre.id_for_label }}">Nombre</label>
+                    {{ form.nombre }}
+                    {{ form.nombre.errors }}
+                </div>
 
-        Actualizar
+                <div class="product-field">
+                    <label for="{{ form.descripcion.id_for_label }}">Descripcion</label>
+                    {{ form.descripcion }}
+                    {{ form.descripcion.errors }}
+                </div>
 
-    </button>
+                <div class="product-field-grid">
+                    <div class="product-field">
+                        <label for="{{ form.categoria.id_for_label }}">Categoria</label>
+                        {{ form.categoria }}
+                        {{ form.categoria.errors }}
+                    </div>
 
-</form>
+                    <div class="product-field">
+                        <label for="{{ form.precio.id_for_label }}">Precio Bs.</label>
+                        {{ form.precio }}
+                        {{ form.precio.errors }}
+                    </div>
+                </div>
+
+                <label class="product-active-row">
+                    {{ form.activo }}
+                    Producto disponible
+                </label>
+                {{ form.activo.errors }}
+            </div>
+
+            <aside class="product-media-panel">
+                <h2>Fotos del producto</h2>
+
+                {% if producto.imagen %}
+                    <div class="product-current-image">
+                        <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+                        <span>Foto principal actual</span>
+                    </div>
+                {% endif %}
+
+                <div class="product-field">
+                    <label for="{{ form.imagen.id_for_label }}">Cambiar foto principal</label>
+                    {{ form.imagen }}
+                    {{ form.imagen.errors }}
+                </div>
+
+                <div class="product-field">
+                    <label for="{{ form.imagenes.id_for_label }}">Agregar fotos a la galeria</label>
+                    {{ form.imagenes }}
+                    <p class="product-help-text">Las fotos nuevas se sumaran a las existentes.</p>
+                    {{ form.imagenes.errors }}
+                </div>
+
+                {% if producto.imagenes.all %}
+                    <div class="product-existing-gallery">
+                        {% for imagen in producto.imagenes.all %}
+                            <img src="{{ imagen.imagen.url }}" alt="{{ imagen.texto_alternativo|default:producto.nombre }}">
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </aside>
+        </div>
+
+        <div class="product-form-actions">
+            <button type="submit" class="product-submit-btn">
+                <i class="bi bi-check2-circle"></i>
+                Actualizar producto
+            </button>
+            <a href="{% url 'detalle_producto' producto.id %}" class="product-cancel-btn">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</section>
 
 {% endblock %}

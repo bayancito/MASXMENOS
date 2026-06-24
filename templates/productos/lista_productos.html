@@ -219,21 +219,32 @@
                             </a>
 
                             <!-- ACCIONES -->
-                            <div class="catalogo-product-actions" style="padding: 0 1.25rem 1.25rem;">
+                            <div class="catalogo-product-actions">
                                 {# Admin o dueño del producto => acciones CRUD #}
-                                {% if user.is_authenticated and user.perfil.rol == 'ADMIN' or user.is_authenticated and producto.productor.usuario == user %}
-                                    <a class="btn btn-warning btn-sm me-2" href="{% url 'editar_producto' producto.id %}">
-                                        <i class="bi bi-pencil"></i> Editar
-                                    </a>
-                                    <a class="btn btn-danger btn-sm" href="{% url 'eliminar_producto' producto.id %}">
-                                        <i class="bi bi-trash"></i> Eliminar
-                                    </a>
-                                {% else %}
-                                    {% if user.is_authenticated %}
+                                {% if user.is_authenticated and user.perfil %}
+                                    {% if user.perfil.rol == 'ADMIN' %}
+                                        <a class="product-action product-action-edit" href="{% url 'editar_producto' producto.id %}">
+                                            <i class="bi bi-pencil"></i> Editar
+                                        </a>
+                                        <a class="product-action product-action-delete" href="{% url 'eliminar_producto' producto.id %}">
+                                            <i class="bi bi-trash"></i> Eliminar
+                                        </a>
+                                    {% elif producto.productor and producto.productor.usuario == user %}
+                                        <a class="product-action product-action-edit" href="{% url 'editar_producto' producto.id %}">
+                                            <i class="bi bi-pencil"></i> Editar
+                                        </a>
+                                        <a class="product-action product-action-delete" href="{% url 'eliminar_producto' producto.id %}">
+                                            <i class="bi bi-trash"></i> Eliminar
+                                        </a>
+                                    {% else %}
                                         <button class="catalogo-action-btn catalogo-btn-add" onclick="agregarAlCarrito({{ producto.id }})">
                                             <i class="bi bi-plus"></i> Añadir
                                         </button>
                                     {% endif %}
+                                {% else %}
+                                    <a class="product-action product-action-view" href="{% url 'detalle_producto' producto.id %}">
+                                        <i class="bi bi-eye"></i> Ver detalle
+                                    </a>
                                 {% endif %} 
 
                                                             

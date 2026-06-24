@@ -1,49 +1,66 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}
-Solicitar — {{ producto.nombre }}
+Solicitar - {{ producto.nombre }}
 {% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="{% static 'css/catalogo.css' %}">
 
-<div class="card mx-auto" style="max-width: 720px;">
-    <div class="card-body">
-        <h2 class="h4 mb-3">Solicitar producto</h2>
-
-        <div class="mb-4">
-            <div class="text-secondary small">Producto</div>
-            <div class="fw-semibold">{{ producto.nombre }}</div>
+<section class="request-form-page">
+    <header class="request-header compact">
+        <div>
+            <p class="request-kicker">Nueva solicitud</p>
+            <h1>Solicitar producto</h1>
+            <p>Indica la cantidad que necesitas y envia un mensaje al productor.</p>
         </div>
+        <a href="{% url 'detalle_producto' producto.id %}" class="request-back">
+            <i class="bi bi-arrow-left"></i>
+            Volver al producto
+        </a>
+    </header>
 
-        <form method="post">
+    <div class="request-form-card">
+        <aside class="request-product-summary">
+            {% if producto.imagen %}
+                <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+            {% else %}
+                <img src="{% static 'img/producto-default.png' %}" alt="Producto sin imagen">
+            {% endif %}
+            <div>
+                <span>Producto</span>
+                <h2>{{ producto.nombre }}</h2>
+                <p>Bs. {{ producto.precio }}</p>
+            </div>
+        </aside>
+
+        <form method="post" class="request-editor">
             {% csrf_token %}
 
-            <div class="mb-3">
-                {{ form.cantidad.label_tag }}
+            <div class="request-field">
+                <label for="{{ form.cantidad.id_for_label }}">Cantidad</label>
                 {{ form.cantidad }}
-                {% if form.cantidad.errors %}
-                    <div class="text-danger small mt-1">{{ form.cantidad.errors }}</div>
-                {% endif %}
+                {{ form.cantidad.errors }}
             </div>
 
-            <div class="mb-3">
-                {{ form.mensaje.label_tag }}
+            <div class="request-field">
+                <label for="{{ form.mensaje.id_for_label }}">Mensaje</label>
                 {{ form.mensaje }}
-                {% if form.mensaje.errors %}
-                    <div class="text-danger small mt-1">{{ form.mensaje.errors }}</div>
-                {% endif %}
+                {{ form.mensaje.errors }}
             </div>
 
-            <button type="submit" class="btn btn-success">
-                Enviar solicitud
-            </button>
-
-            <a href="{% url 'detalle_producto' producto.id %}" class="btn btn-outline-secondary ms-2">
-                Cancelar
-            </a>
+            <div class="request-form-actions">
+                <button type="submit" class="request-primary">
+                    <i class="bi bi-send"></i>
+                    Enviar solicitud
+                </button>
+                <a href="{% url 'detalle_producto' producto.id %}" class="request-secondary">
+                    Cancelar
+                </a>
+            </div>
         </form>
     </div>
-</div>
+</section>
 
 {% endblock %}
-

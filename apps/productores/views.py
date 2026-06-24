@@ -5,9 +5,11 @@ from django.shortcuts import (
     get_object_or_404,
     redirect
 )
+from django.urls import reverse
 
 from .models import Productor
 from .forms import ProductorForm
+from apps.productos.models import Categoria
 
 from apps.usuarios.decorators import es_productor_o_admin
 
@@ -256,12 +258,83 @@ def mapa_productores(request):
 
     productores = Productor.objects.filter(
         activo=True
+    ).prefetch_related(
+        'productos__categoria'
+    ).annotate(
+        num_productos=Count('productos')
     )
+
+    productores_mapa = []
+
+    for productor in productores:
+        if not productor.latitud or not productor.longitud:
+            continue
+
+        productos = [
+            producto
+            for producto in productor.productos.all()
+            if producto.activo
+        ]
+
+        categorias = []
+        productos_data = []
+
+        for producto in productos:
+            categoria = producto.categoria.nombre if producto.categoria else 'Sin categoria'
+
+            if categoria not in categorias:
+                categorias.append(categoria)
+
+            productos_data.append(
+                {
+                    'id': producto.id,
+                    'nombre': producto.nombre,
+                    'categoria': categoria,
+                    'precio': str(producto.precio),
+                }
+            )
+
+        productores_mapa.append(
+            {
+                'id': productor.id,
+                'nombre': productor.nombre_comercial,
+                'telefono': productor.telefono,
+                'direccion': productor.direccion,
+                'municipio': productor.municipio,
+                'descripcion': productor.descripcion,
+                'lat': float(productor.latitud),
+                'lng': float(productor.longitud),
+                'imagen': productor.imagen_perfil.url if productor.imagen_perfil else '',
+                'productos_count': len(productos),
+                'productos': productos_data,
+                'categorias': categorias,
+                'perfil_url': reverse('detalle_productor', args=[productor.id]),
+                'activo': productor.activo,
+                'tiene_foto': bool(productor.imagen_perfil),
+            }
+        )
+
+    municipios = Productor.objects.filter(
+        activo=True
+    ).order_by(
+        'municipio'
+    ).values_list(
+        'municipio',
+        flat=True
+    ).distinct()
+
+    categorias = Categoria.objects.filter(
+        activa=True,
+        productos__productor__activo=True,
+    ).distinct().order_by('nombre')
 
     return render(
         request,
         'productores/mapa_productores.html',
         {
-            'productores': productores
+            'productores': productores,
+            'productores_mapa': productores_mapa,
+            'municipios': municipios,
+            'categorias': categorias,
         }
     )

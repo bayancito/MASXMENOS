@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Categoria, Producto, Solicitud, Cosecha
+from .models import Categoria, Producto, ProductoImagen, Solicitud, Cosecha, ContactoProducto, SolicitudCompra
 
 
 
@@ -27,6 +27,7 @@ class SolicitudAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'comprador',
+        'productor',
         'producto',
         'cantidad',
         'estado',
@@ -35,6 +36,7 @@ class SolicitudAdmin(admin.ModelAdmin):
 
     search_fields = (
         'comprador__username',
+        'productor__nombre_comercial',
         'producto__nombre',
     )
 
@@ -42,6 +44,62 @@ class SolicitudAdmin(admin.ModelAdmin):
         'estado',
         'fecha_creacion',
     )
+
+
+@admin.register(ContactoProducto)
+class ContactoProductoAdmin(admin.ModelAdmin):
+
+    list_display = (
+        'id',
+        'comprador',
+        'productor',
+        'producto',
+        'canal',
+        'fecha_creacion',
+    )
+
+    search_fields = (
+        'comprador__username',
+        'productor__nombre_comercial',
+        'producto__nombre',
+        'mensaje',
+    )
+
+    list_filter = (
+        'canal',
+        'fecha_creacion',
+    )
+
+
+@admin.register(SolicitudCompra)
+class SolicitudCompraAdmin(admin.ModelAdmin):
+
+    list_display = (
+        'id',
+        'comprador',
+        'productor',
+        'producto',
+        'cantidad_solicitada',
+        'estado',
+        'fecha_creacion',
+    )
+
+    search_fields = (
+        'comprador__username',
+        'productor__nombre_comercial',
+        'producto__nombre',
+        'mensaje_adicional',
+    )
+
+    list_filter = (
+        'estado',
+        'fecha_creacion',
+    )
+
+
+class ProductoImagenInline(admin.TabularInline):
+    model = ProductoImagen
+    extra = 1
 
 
 @admin.register(Producto)
@@ -80,6 +138,10 @@ class ProductoAdmin(admin.ModelAdmin):
             'fields': ('productor',)
         }),
     )
+
+    inlines = [
+        ProductoImagenInline,
+    ]
 
 
 @admin.register(Cosecha)

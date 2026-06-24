@@ -1,23 +1,108 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}
-Nuevo Producto
+Nuevo Producto - MASXMENOS
 {% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="{% static 'css/catalogo.css' %}">
 
-<h2>Registrar Producto</h2>
+<section class="product-form-page">
+    <header class="product-form-header">
+        <div>
+            <p class="product-form-kicker">Catalogo agricola</p>
+            <h1>Registrar producto</h1>
+            <p>Agrega la informacion comercial, una foto principal y una galeria para mostrar mejor tu oferta.</p>
+        </div>
+        <a href="{% url 'lista_productos' %}" class="product-form-back">
+            <i class="bi bi-arrow-left"></i>
+            Volver al catalogo
+        </a>
+    </header>
 
-<form method="post" enctype="multipart/form-data">
+    <form method="post" enctype="multipart/form-data" class="product-editor-card">
+        {% csrf_token %}
 
-    {% csrf_token %}
+        {% if form.errors %}
+            <div class="product-form-alert">
+                Revisa los campos marcados antes de guardar.
+            </div>
+        {% endif %}
 
-    {{ form.as_p }}
+        <div class="product-editor-grid">
+            <div class="product-form-panel">
+                <h2>Informacion del producto</h2>
 
-    <button type="submit" class="btn btn-success">
-        Guardar
-    </button>
+                <div class="product-field">
+                    <label for="{{ form.nombre.id_for_label }}">Nombre</label>
+                    {{ form.nombre }}
+                    {{ form.nombre.errors }}
+                </div>
 
-</form>
+                <div class="product-field">
+                    <label for="{{ form.descripcion.id_for_label }}">Descripcion</label>
+                    {{ form.descripcion }}
+                    {{ form.descripcion.errors }}
+                </div>
+
+                <div class="product-field-grid">
+                    <div class="product-field">
+                        <label for="{{ form.categoria.id_for_label }}">Categoria</label>
+                        {{ form.categoria }}
+                        {{ form.categoria.errors }}
+                    </div>
+
+                    <div class="product-field">
+                        <label for="{{ form.precio.id_for_label }}">Precio Bs.</label>
+                        {{ form.precio }}
+                        {{ form.precio.errors }}
+                    </div>
+                </div>
+
+                <label class="product-active-row">
+                    {{ form.activo }}
+                    Producto disponible
+                </label>
+                {{ form.activo.errors }}
+            </div>
+
+            <aside class="product-media-panel">
+                <h2>Fotos del producto</h2>
+
+                <div class="product-field">
+                    <label for="{{ form.imagen.id_for_label }}">Foto principal</label>
+                    {{ form.imagen }}
+                    {{ form.imagen.errors }}
+                </div>
+
+                <div class="product-field">
+                    <label for="{{ form.imagenes.id_for_label }}">Galeria adicional</label>
+                    {{ form.imagenes }}
+                    <p class="product-help-text">Selecciona varias imagenes para que se visualicen en el detalle.</p>
+                    {{ form.imagenes.errors }}
+                </div>
+
+                <div class="product-upload-preview">
+                    <i class="bi bi-images"></i>
+                    <div>
+                        <strong>Mejor presentacion</strong>
+                        <span>Usa fotos claras del producto, cosecha, empaque o punto de entrega.</span>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <div class="product-form-actions">
+            <button type="submit" class="product-submit-btn">
+                <i class="bi bi-check2-circle"></i>
+                Guardar producto
+            </button>
+            <a href="{% url 'lista_productos' %}" class="product-cancel-btn">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</section>
 
 {% endblock %}

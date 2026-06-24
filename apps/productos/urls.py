@@ -7,6 +7,7 @@ from .views import (
     editar_producto,
     eliminar_producto,
     solicitar_producto,
+    contactar_productor_whatsapp,
     dashboard_productor,
     crear_cosecha,
     mis_cosechas,
@@ -52,6 +53,12 @@ urlpatterns = favoritos_urls + [
         '<int:pk>/solicitar/',
         solicitar_producto,
         name='solicitar_producto'
+    ),
+
+    path(
+        '<int:pk>/contactar-whatsapp/',
+        contactar_productor_whatsapp,
+        name='contactar_productor_whatsapp'
     ),
 
     path(

@@ -28,11 +28,11 @@ from .models import Incidencia
 @es_admin
 def reportes(request):
 
-    categorias = Categoria.objects.annotate(
+    categorias_qs = Categoria.objects.annotate(
         total_productos=Count('productos')
     ).order_by('nombre')
 
-    municipios = Productor.objects.values(
+    municipios_qs = Productor.objects.values(
         'municipio'
     ).annotate(
         total_productores=Count('id')
@@ -72,6 +72,39 @@ def reportes(request):
     productos_activos = Producto.objects.filter(
         activo=True
     ).count()
+    incidencias_activas = Incidencia.objects.filter(activa=True).count()
+
+    porcentaje_activos = round(
+        (productos_activos / total_productos) * 100
+    ) if total_productos else 0
+
+    max_categoria = max(categorias_data, default=0) or 1
+    max_municipio = max(municipios_data, default=0) or 1
+
+    categorias = [
+        {
+            "nombre": categoria.nombre,
+            "total_productos": categoria.total_productos,
+            "porcentaje": round(
+                (categoria.total_productos / max_categoria) * 100
+            ),
+        }
+        for categoria in categorias_qs
+    ]
+
+    municipios = [
+        {
+            "municipio": item["municipio"] or "Sin municipio",
+            "total_productores": item["total_productores"],
+            "porcentaje": round(
+                (item["total_productores"] / max_municipio) * 100
+            ),
+        }
+        for item in municipios_qs
+    ]
+
+    categoria_lider = categorias[0]["nombre"] if categorias else "Sin datos"
+    municipio_lider = municipios[0]["municipio"] if municipios else "Sin datos"
 
     return render(
         request,
@@ -83,6 +116,10 @@ def reportes(request):
             'total_productores': total_productores,
             'total_categorias': total_categorias,
             'productos_activos': productos_activos,
+            'incidencias_activas': incidencias_activas,
+            'porcentaje_activos': porcentaje_activos,
+            'categoria_lider': categoria_lider,
+            'municipio_lider': municipio_lider,
             'categorias_labels': categorias_labels,
             'categorias_data': categorias_data,
             'municipios_labels': municipios_labels,

@@ -16,16 +16,20 @@ def agregar_favorito(request, producto_id):
 def mis_favoritos(request):
     favoritos = (
         Favorito.objects.filter(usuario=request.user)
-        .select_related('producto')
+        .select_related(
+            'producto',
+            'producto__categoria',
+            'producto__productor',
+        )
+        .prefetch_related('producto__imagenes')
         .order_by('-fecha_creacion')
     )
 
-    productos = [f.producto for f in favoritos]
     return render(
         request,
         'productos/mis_favoritos.html',
         {
-            'productos': productos,
+            'favoritos': favoritos,
         },
     )
 

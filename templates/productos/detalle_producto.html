@@ -1,164 +1,218 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}
-{{ producto.nombre }}
+{{ producto.nombre }} - MASXMENOS
 {% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="{% static 'css/catalogo.css' %}">
 
-<h2>{{ producto.nombre }}</h2>
-
-{% if producto.imagen %}
-
-    <img
-        src="{{ producto.imagen.url }}"
-        alt="{{ producto.nombre }}"
-        class="img-fluid rounded mb-3"
-        style="max-width: 400px;">
-
-{% else %}
-
-    <img
-        src="/static/img/producto-default.png"
-        alt="Producto sin imagen"
-        class="img-fluid rounded mb-3"
-        style="max-width: 400px;">
-
-{% endif %}
-
-<hr>
-
-<p>
-
-    <strong>Categoría:</strong>
-
-    {{ producto.categoria }}
-
-</p>
-
-<p>
-
-    <strong>Precio:</strong>
-
-    <span class="badge bg-success fs-6">Bs. {{ producto.precio }}</span>
-
-</p>
-
-{% if producto.productor %}
-
-    <hr>
-
-    <p>
-
-        <strong>Productor:</strong>
-
-        {% if producto.productor.id %}
-
-            <a href="{% url 'detalle_productor' producto.productor.id %}">
-
-                {{ producto.productor.nombre_comercial }}
-
-            </a>
-
-        {% else %}
-
-            {{ producto.productor.nombre_comercial }}
-
-        {% endif %}
-
-    </p>
-
-    <p>
-
-        <strong>Municipio:</strong>
-
-        {{ producto.productor.municipio }}
-
-    </p>
-
-    <p>
-
-        <strong>Teléfono:</strong>
-
-        {{ producto.productor.telefono }}
-
-    </p>
-
-    {% if producto.productor.telefono %}
-
-        <a
-            href="https://wa.me/{{ producto.productor.telefono }}"
-            target="_blank"
-            class="btn btn-success"
-        >
-            Contactar por WhatsApp
+<section class="product-detail-page">
+    <div class="product-detail-toolbar">
+        <a href="{% url 'lista_productos' %}" class="product-form-back">
+            <i class="bi bi-arrow-left"></i>
+            Volver al catalogo
         </a>
 
-    {% endif %}
+        <div class="product-detail-actions">
+            {% if user.is_authenticated %}
+                <a href="{% url 'agregar_favorito' producto.id %}" class="product-action product-action-view">
+                    <i class="bi bi-heart"></i>
+                    Favorito
+                </a>
+            {% endif %}
 
-{% endif %}
+            {% if user.is_authenticated and user.perfil and user.perfil.rol == 'COMPRADOR' %}
+                <a href="#solicitar-producto" class="product-action product-action-primary">
+                    <i class="bi bi-bag-check"></i>
+                    Solicitar producto
+                </a>
+            {% elif user.is_authenticated and user.perfil %}
+                {% if user.perfil.rol == 'ADMIN' %}
+                    <a href="{% url 'editar_producto' producto.id %}" class="product-action product-action-edit">
+                        <i class="bi bi-pencil"></i>
+                        Editar
+                    </a>
+                    <a href="{% url 'eliminar_producto' producto.id %}" class="product-action product-action-delete">
+                        <i class="bi bi-trash"></i>
+                        Eliminar
+                    </a>
+                {% elif producto.productor and producto.productor.usuario == user %}
+                    <a href="{% url 'editar_producto' producto.id %}" class="product-action product-action-edit">
+                        <i class="bi bi-pencil"></i>
+                        Editar
+                    </a>
+                    <a href="{% url 'eliminar_producto' producto.id %}" class="product-action product-action-delete">
+                        <i class="bi bi-trash"></i>
+                        Eliminar
+                    </a>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
 
-<p>
+    <div class="product-detail-grid">
+        <div class="product-gallery">
+            <div class="product-gallery-main">
+                {% if producto.imagen %}
+                    <img id="product-main-image" src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+                {% elif producto.imagenes.all %}
+                    {% for imagen in producto.imagenes.all %}
+                        {% if forloop.first %}
+                            <img id="product-main-image" src="{{ imagen.imagen.url }}" alt="{{ imagen.texto_alternativo|default:producto.nombre }}">
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <img id="product-main-image" src="{% static 'img/producto-default.png' %}" alt="Producto sin imagen">
+                {% endif %}
+            </div>
 
-    <strong>Descripción:</strong>
+            <div class="product-gallery-thumbs" aria-label="Galeria de producto">
+                {% if producto.imagen %}
+                    <button type="button" class="active" data-image="{{ producto.imagen.url }}">
+                        <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+                    </button>
+                {% endif %}
 
-    {{ producto.descripcion }}
+                {% for imagen in producto.imagenes.all %}
+                    <button type="button" data-image="{{ imagen.imagen.url }}">
+                        <img src="{{ imagen.imagen.url }}" alt="{{ imagen.texto_alternativo|default:producto.nombre }}">
+                    </button>
+                {% endfor %}
+            </div>
+        </div>
 
-    {% if user.is_authenticated %}
-    <a
-        href="{% url 'agregar_favorito' producto.id %}"
-        class="btn btn-outline-danger"
-        title="Guardar en favoritos"
-    >
-        ❤️ Guardar en favoritos
-    </a>
-    <br>
-    {% endif %}
+        <article class="product-detail-panel">
+            <div class="product-detail-status">
+                {% if producto.activo %}
+                    <span class="available"><i class="bi bi-check-circle"></i> Disponible</span>
+                {% else %}
+                    <span><i class="bi bi-pause-circle"></i> No disponible</span>
+                {% endif %}
+            </div>
 
-    {% if user.is_authenticated and user.perfil.rol == 'COMPRADOR' %}
+            <h1>{{ producto.nombre }}</h1>
 
-    <a href="{% url 'solicitar_producto' producto.id %}" class="btn btn-success">
-        Solicitar producto
-    </a>
+            <div class="product-detail-price">
+                <strong>Bs. {{ producto.precio }}</strong>
+                <span>/ unidad</span>
+            </div>
 
-    {% else %}
+            <p class="product-detail-description">
+                {{ producto.descripcion|default:"Este producto aun no tiene descripcion registrada." }}
+            </p>
 
+            <dl class="product-detail-meta">
+                <div>
+                    <dt>Categoria</dt>
+                    <dd>{{ producto.categoria|default:"Sin categoria" }}</dd>
+                </div>
+                <div>
+                    <dt>Estado</dt>
+                    <dd>{% if producto.activo %}Activo en catalogo{% else %}Pausado{% endif %}</dd>
+                </div>
+                <div>
+                    <dt>Fotos</dt>
+                    <dd>{{ gallery_count|default:0 }} imagenes</dd>
+                </div>
+            </dl>
 
-    <a
-        href="{% url 'editar_producto' producto.id %}"
+            {% if producto.productor %}
+                <section class="product-producer-box">
+                    <div class="product-producer-avatar">
+                        {{ producto.productor.nombre_comercial|slice:":2"|upper }}
+                    </div>
+                    <div>
+                        <span>Productor</span>
+                        <h2>
+                            <a href="{% url 'detalle_productor' producto.productor.id %}">
+                                {{ producto.productor.nombre_comercial }}
+                            </a>
+                        </h2>
+                        <p><i class="bi bi-geo-alt"></i> {{ producto.productor.municipio }}</p>
+                    </div>
+                </section>
 
-    class="btn btn-warning">
+                <div class="product-contact-actions">
+                    {% if producto.productor.telefono %}
+                        {% if user.is_authenticated and user.perfil and user.perfil.rol == 'COMPRADOR' %}
+                        <a href="#solicitar-producto" class="product-action product-action-primary">
+                            <i class="bi bi-bag-check"></i>
+                            Solicitar producto
+                        </a>
+                        {% endif %}
+                    {% endif %}
+                    <a href="{% url 'detalle_productor' producto.productor.id %}" class="product-action product-action-view">
+                        <i class="bi bi-person"></i>
+                        Ver productor
+                    </a>
+                </div>
+            {% endif %}
 
-    Editar
+            {% if user.is_authenticated and user.perfil and user.perfil.rol == 'COMPRADOR' and producto.productor %}
+                <section class="request-form-card" id="solicitar-producto">
+                    <header class="request-header compact">
+                        <div>
+                            <p class="request-kicker">Solicitar producto</p>
+                            <h2>Enviar solicitud por WhatsApp</h2>
+                            <p>Indica la cantidad y un mensaje para el productor.</p>
+                        </div>
+                    </header>
 
-    </a>
+                    <form method="post" action="{% url 'solicitar_producto' producto.id %}" class="request-editor">
+                        {% csrf_token %}
 
-    <a href="{% url 'eliminar_producto' producto.id %}"
-    class="btn btn-danger">
+                        <div class="request-field">
+                            <label for="{{ solicitud_compra_form.cantidad_solicitada.id_for_label }}">Cantidad solicitada</label>
+                            {{ solicitud_compra_form.cantidad_solicitada }}
+                            {{ solicitud_compra_form.cantidad_solicitada.errors }}
+                        </div>
 
-        Eliminar
+                        <div class="request-field">
+                            <label for="{{ solicitud_compra_form.mensaje_adicional.id_for_label }}">Mensaje adicional</label>
+                            {{ solicitud_compra_form.mensaje_adicional }}
+                            {{ solicitud_compra_form.mensaje_adicional.errors }}
+                        </div>
 
-    </a>
+                        <button type="submit" class="request-primary">
+                            <i class="bi bi-whatsapp"></i>
+                            Guardar y abrir WhatsApp
+                        </button>
+                    </form>
+                </section>
+            {% elif not user.is_authenticated %}
+                <section class="request-form-card" id="solicitar-producto">
+                    <header class="request-header compact">
+                        <div>
+                            <p class="request-kicker">Solicitar producto</p>
+                            <h2>Inicia sesion para contactar al productor</h2>
+                            <p>Necesitas una cuenta de comprador para registrar tu solicitud.</p>
+                        </div>
+                    </header>
+                    <a href="{% url 'login' %}" class="request-primary">
+                        Iniciar sesion
+                    </a>
+                </section>
+            {% endif %}
+        </article>
+    </div>
+</section>
 
-    {% endif %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var mainImage = document.getElementById('product-main-image');
+    var thumbs = document.querySelectorAll('.product-gallery-thumbs button');
 
-
-</p>
-
-
-<p>
-
-    <strong>Activo:</strong>
-
-    {{ producto.activo }}
-
-</p>
-
-<a href="{% url 'lista_productos' %}"
-   class="btn btn-secondary">
-
-    Volver
-
-</a>
+    thumbs.forEach(function (button) {
+        button.addEventListener('click', function () {
+            mainImage.src = button.dataset.image;
+            thumbs.forEach(function (item) {
+                item.classList.toggle('active', item === button);
+            });
+        });
+    });
+});
+</script>
 
 {% endblock %}

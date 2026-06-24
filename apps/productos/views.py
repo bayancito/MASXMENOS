@@ -1,11 +1,55 @@
+import re
+from urllib.parse import quote
+
+from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_POST
 
 from apps.usuarios.decorators import es_productor_o_admin
 
-from .forms import ProductoForm, SolicitudForm, CosechaForm
-from .models import Producto, Categoria, Favorito, Solicitud, Cosecha
+from .forms import ProductoForm, SolicitudForm, CosechaForm, SolicitudCompraForm
+from .models import Producto, ProductoImagen, Categoria, Favorito, Solicitud, Cosecha, ContactoProducto, SolicitudCompra
+
+
+def _normalizar_telefono_whatsapp(telefono):
+    telefono = re.sub(r'\D+', '', telefono or '')
+
+    if telefono.startswith('00'):
+        telefono = telefono[2:]
+
+    return telefono
+
+
+def _mensaje_whatsapp_producto(producto):
+    return (
+        f"Hola, estoy interesado en el producto {producto.nombre}. "
+        "Lo vi en MASXMENOS y quisiera coordinar la compra."
+    )
+
+
+def _mensaje_whatsapp_solicitud_compra(solicitud):
+    mensaje = (
+        f"Hola, estoy interesado en el producto {solicitud.producto.nombre}. "
+        f"Cantidad solicitada: {solicitud.cantidad_solicitada}."
+    )
+
+    if solicitud.mensaje_adicional:
+        mensaje += f" Mensaje adicional: {solicitud.mensaje_adicional}"
+
+    return mensaje
+
+
+def _guardar_imagenes_producto(producto, imagenes):
+    orden_base = producto.imagenes.count()
+
+    for index, imagen in enumerate(imagenes):
+        ProductoImagen.objects.create(
+            producto=producto,
+            imagen=imagen,
+            texto_alternativo=producto.nombre,
+            orden=orden_base + index,
+        )
 
 
 @es_productor_o_admin
@@ -20,7 +64,11 @@ def crear_producto(request):
                 producto.productor = request.user.productor
 
             producto.save()
-            return redirect('/')
+            _guardar_imagenes_producto(
+                producto,
+                request.FILES.getlist('imagenes')
+            )
+            return redirect('detalle_producto', pk=producto.pk)
     else:
         form = ProductoForm()
 
@@ -37,7 +85,13 @@ def lista_productos(request):
     busqueda = request.GET.get('q', '')
     categoria_id = request.GET.get('categoria', '')
 
-    productos = Producto.objects.all()
+    productos = Producto.objects.select_related(
+        'categoria',
+        'productor',
+        'productor__usuario',
+    ).prefetch_related(
+        'imagenes'
+    )
 
     if busqueda:
         productos = productos.filter(nombre__icontains=busqueda)
@@ -64,13 +118,23 @@ def lista_productos(request):
 
 
 def detalle_producto(request, pk):
-    producto = get_object_or_404(Producto, pk=pk)
+    producto = get_object_or_404(
+        Producto.objects.select_related(
+            'categoria',
+            'productor',
+        ).prefetch_related(
+            'imagenes'
+        ),
+        pk=pk
+    )
 
     return render(
         request,
         'productos/detalle_producto.html',
         {
             'producto': producto,
+            'gallery_count': producto.imagenes.count() + (1 if producto.imagen else 0),
+            'solicitud_compra_form': SolicitudCompraForm(),
         },
     )
 
@@ -88,7 +152,11 @@ def editar_producto(request, pk):
         form = ProductoForm(request.POST, request.FILES, instance=producto)
 
         if form.is_valid():
-            form.save()
+            producto = form.save()
+            _guardar_imagenes_producto(
+                producto,
+                request.FILES.getlist('imagenes')
+            )
             return redirect('detalle_producto', pk=producto.pk)
     else:
         form = ProductoForm(instance=producto)
@@ -133,7 +201,7 @@ def mis_solicitudes(request):
     if not hasattr(request.user, 'perfil') or request.user.perfil.rol != 'COMPRADOR':
         return redirect('inicio')
 
-    solicitudes = Solicitud.objects.filter(comprador=request.user).order_by('-fecha_creacion')
+    solicitudes = SolicitudCompra.objects.filter(comprador=request.user).order_by('-fecha_creacion')
 
     return render(
         request,
@@ -151,8 +219,8 @@ def solicitudes_recibidas(request):
     if not hasattr(request.user, 'perfil') or request.user.perfil.rol != 'PRODUCTOR':
         return redirect('inicio')
 
-    solicitudes = Solicitud.objects.filter(
-        producto__productor__usuario=request.user
+    solicitudes = SolicitudCompra.objects.filter(
+        productor__usuario=request.user
     ).order_by('-fecha_creacion')
 
     return render(
@@ -175,23 +243,23 @@ def dashboard_productor(request):
         productor__usuario=request.user
     ).count()
 
-    solicitudes_pendientes = Solicitud.objects.filter(
-        producto__productor__usuario=request.user,
-        estado=Solicitud.PENDIENTE
+    solicitudes_pendientes = SolicitudCompra.objects.filter(
+        productor__usuario=request.user,
+        estado=SolicitudCompra.PENDIENTE
     ).count()
 
-    solicitudes_aceptadas = Solicitud.objects.filter(
-        producto__productor__usuario=request.user,
-        estado=Solicitud.ACEPTADA
+    solicitudes_aceptadas = SolicitudCompra.objects.filter(
+        productor__usuario=request.user,
+        estado=SolicitudCompra.ACEPTADA
     ).count()
 
-    solicitudes_rechazadas = Solicitud.objects.filter(
-        producto__productor__usuario=request.user,
-        estado=Solicitud.RECHAZADA
+    solicitudes_rechazadas = SolicitudCompra.objects.filter(
+        productor__usuario=request.user,
+        estado=SolicitudCompra.RECHAZADA
     ).count()
 
-    ultimas_solicitudes = Solicitud.objects.filter(
-        producto__productor__usuario=request.user
+    ultimas_solicitudes = SolicitudCompra.objects.filter(
+        productor__usuario=request.user
     ).order_by('-fecha_creacion')[:5]
 
     return render(
@@ -215,12 +283,12 @@ def aceptar_solicitud(request, pk):
     if not hasattr(request.user, 'perfil') or request.user.perfil.rol != 'PRODUCTOR':
         return redirect('inicio')
 
-    solicitud = get_object_or_404(Solicitud, pk=pk)
+    solicitud = get_object_or_404(SolicitudCompra, pk=pk)
 
-    if solicitud.producto.productor is None or solicitud.producto.productor.usuario != request.user:
+    if solicitud.productor is None or solicitud.productor.usuario != request.user:
         return redirect('inicio')
 
-    solicitud.estado = Solicitud.ACEPTADA
+    solicitud.estado = SolicitudCompra.ACEPTADA
     solicitud.save()
 
     return redirect('solicitudes_recibidas')
@@ -234,12 +302,12 @@ def rechazar_solicitud(request, pk):
     if not hasattr(request.user, 'perfil') or request.user.perfil.rol != 'PRODUCTOR':
         return redirect('inicio')
 
-    solicitud = get_object_or_404(Solicitud, pk=pk)
+    solicitud = get_object_or_404(SolicitudCompra, pk=pk)
 
-    if solicitud.producto.productor is None or solicitud.producto.productor.usuario != request.user:
+    if solicitud.productor is None or solicitud.productor.usuario != request.user:
         return redirect('inicio')
 
-    solicitud.estado = Solicitud.RECHAZADA
+    solicitud.estado = SolicitudCompra.RECHAZADA
     solicitud.save()
 
     return redirect('solicitudes_recibidas')
@@ -253,19 +321,19 @@ def dashboard_comprador(request):
         return redirect('inicio')
 
     total_favoritos = Favorito.objects.filter(usuario=request.user).count()
-    total_solicitudes = Solicitud.objects.filter(comprador=request.user).count()
+    total_solicitudes = SolicitudCompra.objects.filter(comprador=request.user).count()
 
-    solicitudes_pendientes = Solicitud.objects.filter(
+    solicitudes_pendientes = SolicitudCompra.objects.filter(
         comprador=request.user,
-        estado=Solicitud.PENDIENTE
+        estado=SolicitudCompra.PENDIENTE
     ).count()
 
-    solicitudes_aceptadas = Solicitud.objects.filter(
+    solicitudes_aceptadas = SolicitudCompra.objects.filter(
         comprador=request.user,
-        estado=Solicitud.ACEPTADA
+        estado=SolicitudCompra.ACEPTADA
     ).count()
 
-    ultimas_solicitudes = Solicitud.objects.filter(
+    ultimas_solicitudes = SolicitudCompra.objects.filter(
         comprador=request.user
     ).order_by('-fecha_creacion')[:5]
 
@@ -400,27 +468,91 @@ def solicitar_producto(request, pk):
     if request.user.perfil.rol != "COMPRADOR":
         return redirect('login')
 
-    producto = get_object_or_404(Producto, pk=pk)
-
-    if request.method == 'POST':
-        form = SolicitudForm(request.POST)
-
-        if form.is_valid():
-            solicitud = form.save(commit=False)
-            solicitud.comprador = request.user
-            solicitud.producto = producto
-            solicitud.estado = Solicitud.PENDIENTE
-            solicitud.save()
-            return redirect('detalle_producto', pk=pk)
-    else:
-        form = SolicitudForm()
-
-    return render(
-        request,
-        'productos/solicitar_producto.html',
-        {
-            'producto': producto,
-            'form': form,
-        },
+    producto = get_object_or_404(
+        Producto.objects.select_related('productor'),
+        pk=pk,
+        activo=True,
     )
+
+    productor = producto.productor
+    if productor is None:
+        messages.error(
+            request,
+            "Este producto aun no tiene un productor asignado para contactar."
+        )
+        return redirect('detalle_producto', pk=pk)
+
+    telefono = _normalizar_telefono_whatsapp(productor.telefono)
+    if not telefono:
+        messages.error(
+            request,
+            "El productor aun no tiene un telefono de WhatsApp registrado."
+        )
+        return redirect('detalle_producto', pk=pk)
+
+    if request.method != 'POST':
+        return redirect('detalle_producto', pk=pk)
+
+    form = SolicitudCompraForm(request.POST)
+    if not form.is_valid():
+        return render(
+            request,
+            'productos/detalle_producto.html',
+            {
+                'producto': producto,
+                'gallery_count': producto.imagenes.count() + (1 if producto.imagen else 0),
+                'solicitud_compra_form': form,
+            },
+        )
+
+    solicitud = form.save(commit=False)
+    solicitud.comprador = request.user
+    solicitud.productor = productor
+    solicitud.producto = producto
+    solicitud.estado = SolicitudCompra.PENDIENTE
+    solicitud.save()
+
+    mensaje = _mensaje_whatsapp_solicitud_compra(solicitud)
+    return redirect(f"https://wa.me/{telefono}?text={quote(mensaje)}")
+
+
+def contactar_productor_whatsapp(request, pk):
+    if not request.user.is_authenticated or not hasattr(request.user, "perfil"):
+        return redirect('login')
+
+    if request.user.perfil.rol != "COMPRADOR":
+        return redirect('detalle_producto', pk=pk)
+
+    producto = get_object_or_404(
+        Producto.objects.select_related('productor'),
+        pk=pk,
+        activo=True,
+    )
+
+    productor = producto.productor
+    if productor is None:
+        messages.error(
+            request,
+            "Este producto aun no tiene un productor asignado para contactar."
+        )
+        return redirect('detalle_producto', pk=pk)
+
+    telefono = _normalizar_telefono_whatsapp(productor.telefono)
+    if not telefono:
+        messages.error(
+            request,
+            "El productor aun no tiene un telefono de WhatsApp registrado."
+        )
+        return redirect('detalle_producto', pk=pk)
+
+    mensaje = _mensaje_whatsapp_producto(producto)
+    ContactoProducto.objects.create(
+        comprador=request.user,
+        productor=productor,
+        producto=producto,
+        canal=ContactoProducto.CANAL_WHATSAPP,
+        mensaje=mensaje,
+    )
+
+    return redirect(f"https://wa.me/{telefono}?text={quote(mensaje)}")
 

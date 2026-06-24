@@ -1,9 +1,37 @@
 from django import forms
 
-from .models import Producto, Solicitud, Cosecha
+from .models import Producto, Solicitud, Cosecha, SolicitudCompra
+
+
+class MultipleFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+
+class MultipleImageField(forms.FileField):
+    widget = MultipleFileInput
+
+    def clean(self, data, initial=None):
+        files = data if isinstance(data, (list, tuple)) else [data]
+        return [
+            super(MultipleImageField, self).clean(file, initial)
+            for file in files
+            if file
+        ]
 
 
 class ProductoForm(forms.ModelForm):
+    imagenes = MultipleImageField(
+        label="Fotos adicionales",
+        required=False,
+        help_text="Puedes seleccionar varias fotos para la galeria del producto.",
+        widget=MultipleFileInput(
+            attrs={
+                'class': 'form-control',
+                'accept': 'image/*',
+                'multiple': True,
+            }
+        )
+    )
 
     class Meta:
         model = Producto
@@ -14,6 +42,7 @@ class ProductoForm(forms.ModelForm):
             'categoria',
             'precio',
             'imagen',
+            'imagenes',
             'activo'
         ]
 
@@ -35,7 +64,7 @@ class ProductoForm(forms.ModelForm):
             ),
 
             'imagen': forms.ClearableFileInput(
-                attrs={'class': 'form-control'}
+                attrs={'class': 'form-control', 'accept': 'image/*'}
             ),
 
         }
@@ -56,6 +85,38 @@ class SolicitudForm(forms.ModelForm):
             ),
             'mensaje': forms.Textarea(
                 attrs={'class': 'form-control', 'rows': 4}
+            ),
+        }
+
+
+class SolicitudCompraForm(forms.ModelForm):
+
+    class Meta:
+        model = SolicitudCompra
+        fields = [
+            'cantidad_solicitada',
+            'mensaje_adicional',
+        ]
+
+        labels = {
+            'cantidad_solicitada': 'Cantidad solicitada',
+            'mensaje_adicional': 'Mensaje adicional',
+        }
+
+        widgets = {
+            'cantidad_solicitada': forms.NumberInput(
+                attrs={
+                    'class': 'form-control',
+                    'min': 1,
+                    'placeholder': 'Ej. 5',
+                }
+            ),
+            'mensaje_adicional': forms.Textarea(
+                attrs={
+                    'class': 'form-control',
+                    'rows': 4,
+                    'placeholder': 'Ej. Quisiera coordinar entrega para mañana.',
+                }
             ),
         }
 

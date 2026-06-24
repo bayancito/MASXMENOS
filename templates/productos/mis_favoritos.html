@@ -1,58 +1,128 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}
-Mis favoritos — MASXMENOS
+Mis favoritos - MASXMENOS
 {% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="{% static 'css/catalogo.css' %}">
 
-<h2 class="mb-4">Mis favoritos</h2>
-
-{% if productos %}
-
-<div class="row row-cols-1 row-cols-md-2 g-3">
-
-    {% for producto in productos %}
-
-    <div class="col">
-
-        <div class="card h-100">
-
-            <div class="card-body">
-
-                <h5 class="card-title">
-                    <a href="{% url 'detalle_producto' producto.id %}">
-                        {{ producto.nombre }}
-                    </a>
-                </h5>
-
-                {% if producto.categoria %}
-                <p class="text-secondary mb-1">{{ producto.categoria }}</p>
-                {% endif %}
-
-                <p class="mb-0">
-                    <span class="badge text-bg-{{ producto.activo|yesno:'success,secondary' }}">
-                        {{ producto.activo|yesno:'Activo,Inactivo' }}
-                    </span>
-                </p>
-
-            </div>
-
+<section class="favorites-page">
+    <header class="favorites-header">
+        <div>
+            <p class="favorites-kicker">Coleccion personal</p>
+            <h1>Mis favoritos</h1>
+            <p>Guarda productos que te interesan y vuelve a ellos cuando quieras contactar al productor.</p>
         </div>
+        <a href="{% url 'lista_productos' %}" class="favorites-back">
+            <i class="bi bi-grid"></i>
+            Explorar catalogo
+        </a>
+    </header>
 
+    <div class="favorites-summary">
+        <span><strong>{{ favoritos|length }}</strong> favoritos guardados</span>
+        <span><i class="bi bi-heart"></i> Vista comprador</span>
     </div>
 
-    {% endfor %}
+    {% if favoritos %}
+        <div class="favorites-grid">
+            {% for favorito in favoritos %}
+                {% with producto=favorito.producto %}
+                    <article class="favorite-card">
+                        <a href="{% url 'detalle_producto' producto.id %}" class="favorite-media">
+                            {% if producto.imagen %}
+                                <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+                            {% elif producto.imagenes.all %}
+                                {% for imagen in producto.imagenes.all %}
+                                    {% if forloop.first %}
+                                        <img src="{{ imagen.imagen.url }}" alt="{{ producto.nombre }}">
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <img src="{% static 'img/producto-default.png' %}" alt="Producto sin imagen">
+                            {% endif %}
 
-</div>
+                            <span class="favorite-badge">
+                                <i class="bi bi-heart-fill"></i>
+                                Favorito
+                            </span>
+                        </a>
 
-{% else %}
+                        <div class="favorite-body">
+                            <div class="favorite-title-row">
+                                <div>
+                                    <span>{{ producto.categoria|default:"Sin categoria" }}</span>
+                                    <h2>
+                                        <a href="{% url 'detalle_producto' producto.id %}">
+                                            {{ producto.nombre }}
+                                        </a>
+                                    </h2>
+                                </div>
+                                <strong>Bs. {{ producto.precio }}</strong>
+                            </div>
 
-<div class="alert alert-light border text-secondary">
-    Aún no tienes favoritos.
-</div>
+                            <p class="favorite-description">
+                                {{ producto.descripcion|default:"Producto agricola disponible en MASXMENOS."|truncatechars:92 }}
+                            </p>
 
-{% endif %}
+                            <div class="favorite-meta">
+                                <div>
+                                    <dt>Estado</dt>
+                                    <dd>
+                                        {% if producto.activo %}
+                                            <span class="favorite-status active">Disponible</span>
+                                        {% else %}
+                                            <span class="favorite-status">Inactivo</span>
+                                        {% endif %}
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt>Guardado</dt>
+                                    <dd>{{ favorito.fecha_creacion|date:"Y-m-d" }}</dd>
+                                </div>
+                            </div>
+
+                            {% if producto.productor %}
+                                <div class="favorite-producer">
+                                    <div>{{ producto.productor.nombre_comercial|slice:":2"|upper }}</div>
+                                    <p>
+                                        <span>Productor</span>
+                                        <a href="{% url 'detalle_productor' producto.productor.id %}">
+                                            {{ producto.productor.nombre_comercial }}
+                                        </a>
+                                    </p>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="favorite-actions">
+                            <a href="{% url 'detalle_producto' producto.id %}" class="product-action product-action-view">
+                                <i class="bi bi-eye"></i>
+                                Ver detalle
+                            </a>
+                            {% if producto.activo %}
+                                <a href="{% url 'solicitar_producto' producto.id %}" class="product-action product-action-primary">
+                                    <i class="bi bi-bag-check"></i>
+                                    Solicitar
+                                </a>
+                            {% endif %}
+                        </div>
+                    </article>
+                {% endwith %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="favorites-empty">
+            <i class="bi bi-heart"></i>
+            <h2>Aun no tienes favoritos</h2>
+            <p>Marca productos como favoritos para encontrarlos rapido despues.</p>
+            <a href="{% url 'lista_productos' %}" class="favorites-primary">
+                Explorar productos
+            </a>
+        </div>
+    {% endif %}
+</section>
 
 {% endblock %}
-

@@ -1,227 +1,209 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}
-Reportes - MASXMENOS
-{% endblock %}
+{% block title %}Reportes - MASXMENOS{% endblock %}
 
 {% block content %}
-
-<div class="container-xl pt-4 pb-5">
-    
-    <header class="d-flex flex-column flex-lg-row justify-content-between align-items-start gap-4 mb-5">
-        <div class="flex-grow-1">
-            <p class="mb-2 fw-semibold" style="color: #4A6B42; font-size: 0.9rem;">
-                <i class="bi bi-graph-up me-2"></i>Panel agrícola
-            </p>
-            <h1 class="fw-bold mb-2 text-dark" style="font-size: 1.75rem;">
-                Reportes del marketplace
-            </h1>
-            <p class="text-secondary small mb-0" style="max-width: 700px;">
-                Indicadores consolidados de productos, categorías y productores para monitorear el estado actual de MASXMENOS.
-                Validando la intermediación en la región de Cochabamba.
+<div class="reportes-page">
+    <section class="reportes-hero" aria-labelledby="reportes-titulo">
+        <div class="reportes-hero__content">
+            <span class="reportes-kicker">
+                <i class="bi bi-graph-up-arrow"></i>
+                Panel agrícola
+            </span>
+            <h1 id="reportes-titulo">Reportes del marketplace</h1>
+            <p>
+                Indicadores consolidados de productos, categorías, productores e incidencias para monitorear el estado actual de MASXMENOS en Cochabamba.
             </p>
         </div>
 
-        <div class="d-flex flex-wrap gap-2 pt-2" aria-label="Exportar reportes">
-            <a href="{% url 'excel_productos' %}" class="btn btn-sm d-flex align-items-center gap-2 px-3 py-2 fw-medium" style="background-color: #EAF1E8; color: #2F432B; border: 1px solid #D0E0CC; border-radius: 0.5rem;">
-                <span class="badge" style="background-color: #4A6B42; color: white; font-size: 0.65rem; padding: 3px 6px;">XLSX</span>
+        <div class="reportes-actions" aria-label="Exportar reportes">
+            <a href="{% url 'excel_productos' %}" class="reportes-action reportes-action--soft">
+                <i class="bi bi-file-earmark-spreadsheet"></i>
                 <span>Productos</span>
+                <strong>XLSX</strong>
             </a>
-
-            <a href="{% url 'excel_productores' %}" class="btn btn-sm d-flex align-items-center gap-2 px-3 py-2 fw-medium" style="background-color: #EAF1E8; color: #2F432B; border: 1px solid #D0E0CC; border-radius: 0.5rem;">
-                <span class="badge" style="background-color: #4A6B42; color: white; font-size: 0.65rem; padding: 3px 6px;">XLSX</span>
+            <a href="{% url 'excel_productores' %}" class="reportes-action reportes-action--soft">
+                <i class="bi bi-people"></i>
                 <span>Productores</span>
+                <strong>XLSX</strong>
             </a>
-
-            <a href="{% url 'exportar_pdf' %}" class="btn btn-sm d-flex align-items-center gap-2 px-3 py-2 fw-medium text-white" style="background-color: #2F432B; border: none; border-radius: 0.5rem;">
-                <span class="badge" style="background-color: #ffffff; color: #2F432B; font-size: 0.65rem; padding: 3px 6px;">PDF</span>
+            <a href="{% url 'exportar_pdf' %}" class="reportes-action reportes-action--dark">
+                <i class="bi bi-file-earmark-pdf"></i>
                 <span>General</span>
+                <strong>PDF</strong>
             </a>
         </div>
-    </header>
+    </section>
 
-    <section class="mb-5" aria-labelledby="resumen-titulo">
-        <div class="mb-4">
-            <h2 id="resumen-titulo" class="h5 fw-bold text-dark mb-1">
-                <i class="bi bi-speedometer2 me-2" style="color: #4A6B42;"></i>Resumen General
-            </h2>
-            <p class="text-secondary small mb-0">
-                Lectura rápida del volumen registrado en la plataforma.
-            </p>
+    <section class="reportes-strip" aria-label="Lectura rápida">
+        <div>
+            <span>Productos activos</span>
+            <strong>{{ porcentaje_activos }}%</strong>
         </div>
-
-        <div class="row g-4">
-            <div class="col-sm-6 col-xl-3">
-                <div class="agro-card p-4 bg-white h-100 d-flex flex-column" style="border: 1px solid #EAF1E8; border-radius: 1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.04);">
-                    <div class="rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 40px; height: 40px; background-color: #F7F9F6; color: #4A6B42;">
-                        <i class="bi bi-box"></i>
-                    </div>
-                    <p class="fs-2 fw-bold mb-1" style="color: #152013; line-height: 1;">{{ total_productos }}</p>
-                    <h3 class="fw-semibold text-dark mb-1" style="font-size: 0.95rem;">Total productos</h3>
-                    <p class="text-secondary small mb-0 mt-auto">Catálogo agrícola registrado.</p>
-                </div>
-            </div>
-
-            <div class="col-sm-6 col-xl-3">
-                <div class="agro-card p-4 bg-white h-100 d-flex flex-column" style="border: 1px solid #EAF1E8; border-radius: 1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.04);">
-                    <div class="rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 40px; height: 40px; background-color: #EAF1E8; color: #2F432B;">
-                        <i class="bi bi-people"></i>
-                    </div>
-                    <p class="fs-2 fw-bold mb-1" style="color: #152013; line-height: 1;">{{ total_productores }}</p>
-                    <h3 class="fw-semibold text-dark mb-1" style="font-size: 0.95rem;">Total productores</h3>
-                    <p class="text-secondary small mb-0 mt-auto">Unidades productivas vinculadas.</p>
-                </div>
-            </div>
-
-            <div class="col-sm-6 col-xl-3">
-                <div class="agro-card p-4 bg-white h-100 d-flex flex-column" style="border: 1px solid #EAF1E8; border-radius: 1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.04);">
-                    <div class="rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 40px; height: 40px; background-color: #FEF3C7; color: #92400E;">
-                        <i class="bi bi-tag"></i>
-                    </div>
-                    <p class="fs-2 fw-bold mb-1" style="color: #152013; line-height: 1;">{{ total_categorias }}</p>
-                    <h3 class="fw-semibold text-dark mb-1" style="font-size: 0.95rem;">Total categorías</h3>
-                    <p class="text-secondary small mb-0 mt-auto">Clasificación del catálogo.</p>
-                </div>
-            </div>
-
-            <div class="col-sm-6 col-xl-3">
-                <div class="agro-card p-4 bg-white h-100 d-flex flex-column" style="border: 1px solid #EAF1E8; border-radius: 1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.04);">
-                    <div class="rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 40px; height: 40px; background-color: #DCFCE7; color: #166534;">
-                        <i class="bi bi-check2-circle"></i>
-                    </div>
-                    <p class="fs-2 fw-bold mb-1" style="color: #152013; line-height: 1;">{{ productos_activos }}</p>
-                    <h3 class="fw-semibold text-dark mb-1" style="font-size: 0.95rem;">Productos activos</h3>
-                    <p class="text-secondary small mb-0 mt-auto">Oferta disponible para compradores.</p>
-                </div>
-            </div>
+        <div>
+            <span>Categoría destacada</span>
+            <strong>{{ categoria_lider }}</strong>
+        </div>
+        <div>
+            <span>Municipio destacado</span>
+            <strong>{{ municipio_lider }}</strong>
+        </div>
+        <div>
+            <span>Incidencias activas</span>
+            <strong>{{ incidencias_activas }}</strong>
         </div>
     </section>
 
-    <section class="mb-5">
-        <h2 class="h5 fw-bold text-dark mb-4">
-            <i class="bi bi-database me-2" style="color: #4A6B42;"></i>Reportes Operativos
-        </h2>
-
-        <div class="row g-3 mb-4">
-            <div class="col-12 col-md-6">
-                <a href="{% url 'incidencias_nueva' %}" class="btn btn-success w-100">
-                    Reportar incidencia logística
-                </a>
+    <section class="reportes-section" aria-labelledby="resumen-titulo">
+        <div class="reportes-section__heading">
+            <div>
+                <span class="reportes-eyebrow">Resumen</span>
+                <h2 id="resumen-titulo">Estado general</h2>
             </div>
-            <div class="col-12 col-md-6">
-                <a href="{% url 'incidencias_list' %}" class="btn btn-outline-success w-100">
-                    Ver incidencias activas
-                </a>
-            </div>
+            <p>Lectura rápida del volumen registrado en la plataforma.</p>
         </div>
 
-        <div class="row g-4">
-            <div class="col-xl-6">
-                <div class="agro-card bg-white overflow-hidden h-100" style="border: 1px solid #EAF1E8; border-radius: 1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.04);">
-                    <div class="p-4 border-bottom d-flex justify-content-between align-items-start">
-                        <div>
-                            <h3 id="categorias-titulo" class="h6 fw-bold text-dark mb-1">Productos por categoría</h3>
-                            <p class="text-secondary small mb-0">Distribución del catálogo por línea agrícola.</p>
-                        </div>
-                        <span class="badge px-3 py-1.5 rounded-pill" style="background-color: #EAF1E8; color: #2F432B; font-size: 0.75rem; font-weight: 500;">Productos</span>
-                    </div>
+        <div class="reportes-kpis">
+            <article class="reportes-kpi">
+                <span class="reportes-kpi__icon reportes-kpi__icon--green"><i class="bi bi-box-seam"></i></span>
+                <p>{{ total_productos }}</p>
+                <h3>Total productos</h3>
+                <small>Catálogo agrícola registrado.</small>
+            </article>
 
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light">
-                                <tr style="font-size: 0.85rem; color: #64748B;">
-                                    <th scope="col" class="ps-4 py-3">Categoría</th>
-                                    <th scope="col" class="text-end pe-4 py-3">Cantidad</th>
-                                </tr>
-                            </thead>
-                            <tbody style="font-size: 0.9rem; color: #152013;">
-                                {% for categoria in categorias %}
-                                <tr>
-                                    <td class="ps-4 py-3 fw-medium">{{ categoria.nombre }}</td>
-                                    <td class="text-end pe-4 fw-bold" style="color: #4A6B42;">{{ categoria.total_productos }}</td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="2" class="text-center text-secondary py-4">No hay categorías registradas.</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+            <article class="reportes-kpi">
+                <span class="reportes-kpi__icon reportes-kpi__icon--blue"><i class="bi bi-person-badge"></i></span>
+                <p>{{ total_productores }}</p>
+                <h3>Total productores</h3>
+                <small>Unidades productivas vinculadas.</small>
+            </article>
 
-            <div class="col-xl-6">
-                <div class="agro-card bg-white overflow-hidden h-100" style="border: 1px solid #EAF1E8; border-radius: 1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.04);">
-                    <div class="p-4 border-bottom d-flex justify-content-between align-items-start">
-                        <div>
-                            <h3 id="municipios-titulo" class="h6 fw-bold text-dark mb-1">Productores por municipio</h3>
-                            <p class="text-secondary small mb-0">Cobertura territorial de productores registrados en Cochabamba.</p>
-                        </div>
-                        <span class="badge px-3 py-1.5 rounded-pill" style="background-color: #FEF3C7; color: #92400E; font-size: 0.75rem; font-weight: 500;">Territorio</span>
-                    </div>
+            <article class="reportes-kpi">
+                <span class="reportes-kpi__icon reportes-kpi__icon--amber"><i class="bi bi-tags"></i></span>
+                <p>{{ total_categorias }}</p>
+                <h3>Total categorías</h3>
+                <small>Clasificación activa del catálogo.</small>
+            </article>
 
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light">
-                                <tr style="font-size: 0.85rem; color: #64748B;">
-                                    <th scope="col" class="ps-4 py-3">Municipio</th>
-                                    <th scope="col" class="text-end pe-4 py-3">Productores</th>
-                                </tr>
-                            </thead>
-                            <tbody style="font-size: 0.9rem; color: #152013;">
-                                {% for item in municipios %}
-                                <tr>
-                                    <td class="ps-4 py-3 fw-medium">{{ item.municipio }}</td>
-                                    <td class="text-end pe-4 fw-bold" style="color: #4A6B42;">{{ item.total_productores }}</td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="2" class="text-center text-secondary py-4">No hay productores registrados.</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+            <article class="reportes-kpi">
+                <span class="reportes-kpi__icon reportes-kpi__icon--mint"><i class="bi bi-check2-circle"></i></span>
+                <p>{{ productos_activos }}</p>
+                <h3>Productos activos</h3>
+                <small>Oferta visible para compradores.</small>
+            </article>
         </div>
     </section>
 
-    <section>
-        <h2 class="h5 fw-bold text-dark mb-4">
-            <i class="bi bi-pie-chart me-2" style="color: #4A6B42;"></i>Reportes Analíticos
-        </h2>
-        
-        <div class="row g-4">
-            <div class="col-xl-7">
-                <div class="agro-card bg-white p-4" style="border: 1px solid #EAF1E8; border-radius: 1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.04);">
-                    <div class="mb-4">
-                        <h3 id="grafico-categorias-titulo" class="h6 fw-bold text-dark mb-1">Distribución por categoría</h3>
-                        <p class="text-secondary small mb-0">Comparación visual del volumen de productos.</p>
-                    </div>
-                    <div style="height: 300px; position: relative;">
-                        <canvas id="graficoCategorias"></canvas>
-                    </div>
-                </div>
+    <section class="reportes-section" aria-labelledby="operativos-titulo">
+        <div class="reportes-section__heading">
+            <div>
+                <span class="reportes-eyebrow">Operación</span>
+                <h2 id="operativos-titulo">Reportes operativos</h2>
             </div>
+            <div class="reportes-ops">
+                <a href="{% url 'incidencias_nueva' %}" class="reportes-op reportes-op--primary">
+                    <i class="bi bi-plus-circle"></i>
+                    Reportar incidencia
+                </a>
+                <a href="{% url 'incidencias_list' %}" class="reportes-op">
+                    <i class="bi bi-list-check"></i>
+                    Ver incidencias
+                </a>
+            </div>
+        </div>
 
-            <div class="col-xl-5">
-                <div class="agro-card bg-white p-4" style="border: 1px solid #EAF1E8; border-radius: 1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.04);">
-                    <div class="mb-4">
-                        <h3 id="grafico-municipios-titulo" class="h6 fw-bold text-dark mb-1">Productores por municipio</h3>
-                        <p class="text-secondary small mb-0">Participación de cada zona registrada.</p>
+        <div class="reportes-grid">
+            <article class="reportes-panel">
+                <div class="reportes-panel__header">
+                    <div>
+                        <h3>Productos por categoría</h3>
+                        <p>Distribución del catálogo por línea agrícola.</p>
                     </div>
-                    <div style="height: 300px; position: relative;">
-                        <canvas id="graficoMunicipios"></canvas>
+                    <span>Productos</span>
+                </div>
+
+                <div class="reportes-list">
+                    {% for categoria in categorias %}
+                        <div class="reportes-list__row">
+                            <div>
+                                <strong>{{ categoria.nombre }}</strong>
+                                <span>{{ categoria.total_productos }} productos</span>
+                            </div>
+                            <div class="reportes-meter" aria-hidden="true">
+                                <span style="width: {{ categoria.porcentaje }}%;"></span>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p class="reportes-empty">No hay categorías registradas.</p>
+                    {% endfor %}
+                </div>
+            </article>
+
+            <article class="reportes-panel">
+                <div class="reportes-panel__header">
+                    <div>
+                        <h3>Productores por municipio</h3>
+                        <p>Cobertura territorial de productores registrados.</p>
+                    </div>
+                    <span>Territorio</span>
+                </div>
+
+                <div class="reportes-list reportes-list--territory">
+                    {% for item in municipios %}
+                        <div class="reportes-list__row">
+                            <div>
+                                <strong>{{ item.municipio }}</strong>
+                                <span>{{ item.total_productores }} productores</span>
+                            </div>
+                            <div class="reportes-meter reportes-meter--amber" aria-hidden="true">
+                                <span style="width: {{ item.porcentaje }}%;"></span>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p class="reportes-empty">No hay productores registrados.</p>
+                    {% endfor %}
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section class="reportes-section" aria-labelledby="analiticos-titulo">
+        <div class="reportes-section__heading">
+            <div>
+                <span class="reportes-eyebrow">Analítica</span>
+                <h2 id="analiticos-titulo">Reportes analíticos</h2>
+            </div>
+            <p>Comparación visual del volumen de productos y productores.</p>
+        </div>
+
+        <div class="reportes-charts">
+            <article class="reportes-panel reportes-panel--chart">
+                <div class="reportes-panel__header">
+                    <div>
+                        <h3>Distribución por categoría</h3>
+                        <p>Volumen de productos por clasificación.</p>
                     </div>
                 </div>
-            </div>
+                <div class="reportes-chart">
+                    <canvas id="graficoCategorias"></canvas>
+                </div>
+            </article>
+
+            <article class="reportes-panel reportes-panel--chart">
+                <div class="reportes-panel__header">
+                    <div>
+                        <h3>Productores por municipio</h3>
+                        <p>Participación de cada zona registrada.</p>
+                    </div>
+                </div>
+                <div class="reportes-chart">
+                    <canvas id="graficoMunicipios"></canvas>
+                </div>
+            </article>
         </div>
     </section>
 </div>
-
 {% endblock %}
 
 {% block extra_js %}
@@ -233,8 +215,16 @@ Reportes - MASXMENOS
         const municipiosLabels = JSON.parse('{{ municipios_labels_json|escapejs }}');
         const municipiosData = JSON.parse('{{ municipios_data_json|escapejs }}');
 
-        const gridColor = 'rgba(15, 23, 42, 0.05)';
-        const textColor = '#475569';
+        const gridColor = 'rgba(21, 32, 19, 0.08)';
+        const textColor = '#52615c';
+        const tooltipOptions = {
+            backgroundColor: '#152013',
+            titleColor: '#ffffff',
+            bodyColor: '#eaf1e8',
+            padding: 12,
+            cornerRadius: 8,
+            displayColors: false
+        };
 
         const ctxCategorias = document.getElementById('graficoCategorias');
         if (ctxCategorias) {
@@ -245,18 +235,17 @@ Reportes - MASXMENOS
                     datasets: [{
                         label: 'Productos',
                         data: categoriasData,
-                        backgroundColor: '#4A6B42', /* Color verde Agro del Wireframe */
-                        borderColor: '#2F432B',
-                        borderWidth: 0,
+                        backgroundColor: '#4A6B42',
                         borderRadius: 8,
-                        maxBarThickness: 40
+                        maxBarThickness: 38
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { display: false }
+                        legend: { display: false },
+                        tooltip: tooltipOptions
                     },
                     scales: {
                         x: {
@@ -282,28 +271,31 @@ Reportes - MASXMENOS
                     datasets: [{
                         data: municipiosData,
                         backgroundColor: [
-                            '#2F432B', /* Verde Pino */
-                            '#4A6B42', /* Verde Agro */
-                            '#AEC8A8', /* Verde Suave */
-                            '#D59B6A', /* Tierra */
-                            '#C87D43', /* Arcilla */
-                            '#64748b'
+                            '#2F432B',
+                            '#4A6B42',
+                            '#7DA66F',
+                            '#D59B6A',
+                            '#A45F2A',
+                            '#52615c'
                         ],
                         borderColor: '#ffffff',
-                        borderWidth: 3
+                        borderWidth: 4,
+                        hoverOffset: 6
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    cutout: '70%',
+                    cutout: '68%',
                     plugins: {
+                        tooltip: tooltipOptions,
                         legend: {
                             position: 'bottom',
                             labels: {
                                 color: textColor,
                                 usePointStyle: true,
-                                padding: 15,
+                                boxWidth: 8,
+                                padding: 16,
                                 font: { size: 12 }
                             }
                         }

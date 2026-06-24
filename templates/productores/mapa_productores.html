@@ -1,106 +1,487 @@
 {% extends 'base.html' %}
-{% load l10n %}
+{% load static %}
 
 {% block title %}
-Mapa de Productores
+Mapa de Productores - MASXMENOS
 {% endblock %}
 
 {% block content %}
 
-<div class="container-xl py-5">
-    <div class="mapa-header mb-5">
-        <h1 class="h2 fw-bold mb-2">Mapa de Productores</h1>
-        <p class="text-secondary">
-            Localiza productores agrícolas en Cochabamba. Haz clic en los marcadores para ver más información.
-        </p>
-    </div>
+<section class="producer-map-page">
+    <header class="producer-map-hero">
+        <div>
+            <p class="producer-map-kicker">Mapa interactivo de Cochabamba</p>
+            <h1>Mapa de Productores</h1>
+            <p>Localiza productores agricolas, filtra por productos o comunidad y abre su perfil para coordinar directamente.</p>
+        </div>
 
-    <div class="row g-4">
-        <div class="col-12">
-            <div
-                id="mapa-productores"
-                style="height: 600px; width: 100%; border-radius: 12px;"
-            ></div>
+        <div class="producer-map-summary" aria-label="Resumen del mapa">
+            <span><strong>{{ productores_mapa|length }}</strong> ubicados</span>
+            <span><strong>{{ municipios|length }}</strong> comunidades</span>
+            <span><strong>{{ categorias|length }}</strong> categorias</span>
+        </div>
+    </header>
+
+    <div class="producer-map-shell">
+        <aside class="producer-map-filters" aria-label="Filtros del mapa">
+            <div class="producer-filter-heading">
+                <div>
+                    <span>Filtros</span>
+                    <strong>Refina tu busqueda</strong>
+                </div>
+                <button type="button" id="map-clear-filters" title="Limpiar filtros">
+                    <i class="bi bi-arrow-clockwise"></i>
+                </button>
+            </div>
+
+            <label class="producer-map-field">
+                <span>Producto o productor</span>
+                <div class="producer-map-search">
+                    <i class="bi bi-search"></i>
+                    <input type="search" id="map-search" placeholder="Buscar productor o producto...">
+                </div>
+            </label>
+
+            <label class="producer-map-field">
+                <span>Categoria de producto</span>
+                <select id="map-category">
+                    <option value="">Todas las categorias</option>
+                    {% for categoria in categorias %}
+                        <option value="{{ categoria.nombre }}">{{ categoria.nombre }}</option>
+                    {% endfor %}
+                    <option value="Sin categoria">Sin categoria</option>
+                </select>
+            </label>
+
+            <label class="producer-map-field">
+                <span>Comunidad o municipio</span>
+                <select id="map-municipio">
+                    <option value="">Todas las comunidades</option>
+                    {% for municipio in municipios %}
+                        {% if municipio %}
+                            <option value="{{ municipio }}">{{ municipio }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </label>
+
+            <div class="producer-map-field">
+                <span>Disponibilidad</span>
+                <label class="producer-map-check">
+                    <input type="checkbox" id="map-with-products">
+                    <span>Solo con productos activos</span>
+                </label>
+                <label class="producer-map-check">
+                    <input type="checkbox" id="map-with-photo">
+                    <span>Solo con foto de productor</span>
+                </label>
+            </div>
+
+            <label class="producer-map-field">
+                <span>Distancia desde Cochabamba</span>
+                <div class="producer-range-row">
+                    <input type="range" id="map-distance" min="5" max="80" value="80" step="5">
+                    <strong><span id="map-distance-value">80</span> km</strong>
+                </div>
+            </label>
+
+            <div class="producer-map-results">
+                <strong id="map-results-count">0</strong>
+                <span>productores visibles</span>
+            </div>
+        </aside>
+
+        <div class="producer-map-stage">
+            <div class="producer-map-toolbar" aria-label="Herramientas del mapa">
+                <div class="producer-map-layer-toggle" role="group" aria-label="Tipo de mapa">
+                    <button type="button" class="active" data-layer="map">Mapa</button>
+                    <button type="button" data-layer="satellite">Satelite</button>
+                </div>
+
+                <div class="producer-map-tools">
+                    <button type="button" id="map-fit" title="Ver todos los productores">
+                        <i class="bi bi-arrows-fullscreen"></i>
+                    </button>
+                    <button type="button" id="map-locate" title="Usar mi ubicacion">
+                        <i class="bi bi-crosshair"></i>
+                    </button>
+                    <button type="button" id="map-open-list" title="Ver directorio">
+                        <i class="bi bi-list-ul"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="mapa-productores"></div>
+
+            <div class="producer-map-card" id="map-selected-card" hidden>
+                <button type="button" id="map-card-close" title="Cerrar ficha">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+                <div class="producer-map-card-body">
+                    <div class="producer-map-avatar" id="map-card-avatar"></div>
+                    <div>
+                        <span id="map-card-status">Productor activo</span>
+                        <h2 id="map-card-title"></h2>
+                        <p id="map-card-description"></p>
+                    </div>
+                </div>
+                <dl class="producer-map-card-meta">
+                    <div>
+                        <dt><i class="bi bi-basket"></i> Productos</dt>
+                        <dd id="map-card-products"></dd>
+                    </div>
+                    <div>
+                        <dt><i class="bi bi-geo-alt"></i> Comunidad</dt>
+                        <dd id="map-card-municipio"></dd>
+                    </div>
+                    <div>
+                        <dt><i class="bi bi-telephone"></i> Contacto</dt>
+                        <dd id="map-card-phone"></dd>
+                    </div>
+                </dl>
+                <a href="#" id="map-card-link" class="producer-map-profile-link">
+                    Ver perfil completo
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+
+            <div class="producer-map-legend">
+                <strong>Leyenda</strong>
+                <span><i class="legend-dot legend-green"></i> Con productos</span>
+                <span><i class="legend-dot legend-gold"></i> Sin productos activos</span>
+                <span><i class="legend-ring"></i> Seleccionado</span>
+            </div>
         </div>
     </div>
-</div>
+</section>
 
-<div id="datos-productores" style="display:none;">
-
-    {% for productor in productores %}
-
-        {% if productor.latitud and productor.longitud %}
-
-        <span
-            data-lat="{% localize off %}{{ productor.latitud }}{% endlocalize %}"
-            data-lng="{% localize off %}{{ productor.longitud }}{% endlocalize %}"
-            data-nombre="{{ productor.nombre_comercial }}"
-            data-id="{{ productor.id }}"
-        ></span>
-
-        {% endif %}
-
-    {% endfor %}
-
-</div>
+{{ productores_mapa|json_script:"productores-map-data" }}
 
 <script>
-
 document.addEventListener('DOMContentLoaded', function () {
+    var producers = JSON.parse(document.getElementById('productores-map-data').textContent);
+    var cochabambaCenter = [-17.3935, -66.1570];
+    var markers = new Map();
+    var selectedId = null;
+    var userMarker = null;
 
-    var mapa = L.map('mapa-productores').setView(
-        [-17.3935, -66.1570],
-        11
-    );
+    var elements = {
+        search: document.getElementById('map-search'),
+        category: document.getElementById('map-category'),
+        municipio: document.getElementById('map-municipio'),
+        withProducts: document.getElementById('map-with-products'),
+        withPhoto: document.getElementById('map-with-photo'),
+        distance: document.getElementById('map-distance'),
+        distanceValue: document.getElementById('map-distance-value'),
+        results: document.getElementById('map-results-count'),
+        selectedCard: document.getElementById('map-selected-card'),
+        cardAvatar: document.getElementById('map-card-avatar'),
+        cardTitle: document.getElementById('map-card-title'),
+        cardStatus: document.getElementById('map-card-status'),
+        cardDescription: document.getElementById('map-card-description'),
+        cardProducts: document.getElementById('map-card-products'),
+        cardMunicipio: document.getElementById('map-card-municipio'),
+        cardPhone: document.getElementById('map-card-phone'),
+        cardLink: document.getElementById('map-card-link')
+    };
 
-    L.tileLayer(
-        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-        {
+    var map = L.map('mapa-productores', {
+        zoomControl: true,
+        scrollWheelZoom: true
+    }).setView(cochabambaCenter, 10);
+
+    var baseLayers = {
+        map: L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
-            attribution: '© OpenStreetMap contributors'
-        }
-    ).addTo(mapa);
+            attribution: '&copy; OpenStreetMap contributors'
+        }),
+        satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 19,
+            attribution: 'Tiles &copy; Esri'
+        })
+    };
 
-    document
-        .querySelectorAll('#datos-productores span')
-        .forEach(function(item){
+    baseLayers.map.addTo(map);
 
-            var lat = parseFloat(item.dataset.lat);
-            var lng = parseFloat(item.dataset.lng);
-            var nombre = item.dataset.nombre;
-            var id = item.dataset.id;
+    function normalize(value) {
+        return String(value || '')
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '');
+    }
 
-            var marker = L.marker([lat, lng])
-                .addTo(mapa);
-            
-            // Construcción segura del contenido del popup para evitar XSS:
-            // - Insertamos el nombre usando textContent (no concatenación HTML cruda)
-            // - Usamos el id como parte de la URL evitando inyección en HTML
-            var popupEl = document.createElement('div');
-            popupEl.className = 'text-center';
+    function distanceKm(lat1, lng1, lat2, lng2) {
+        var radius = 6371;
+        var dLat = (lat2 - lat1) * Math.PI / 180;
+        var dLng = (lng2 - lng1) * Math.PI / 180;
+        var a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+            + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180)
+            * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        return radius * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
 
-            var strongEl = document.createElement('strong');
-            strongEl.textContent = String(nombre ?? '');
+    function createIcon(producer, isSelected) {
+        var hasProducts = producer.productos_count > 0;
+        return L.divIcon({
+            className: 'producer-div-icon',
+            html: '<span class="producer-map-pin ' + (hasProducts ? 'has-products' : 'no-products') + (isSelected ? ' selected' : '') + '"><i class="bi bi-basket-fill"></i></span>',
+            iconSize: [36, 42],
+            iconAnchor: [18, 38],
+            popupAnchor: [0, -36]
+        });
+    }
 
-            var brEl = document.createElement('br');
+    function popupContent(producer) {
+        var wrapper = document.createElement('div');
+        wrapper.className = 'producer-map-popup';
 
-            var aEl = document.createElement('a');
-            aEl.className = 'btn btn-sm btn-outline-success mt-2';
-            aEl.textContent = 'Ver detalles';
+        var title = document.createElement('strong');
+        title.textContent = producer.nombre;
+        wrapper.appendChild(title);
 
-            // Evita romper el HTML si id trae caracteres raros
-            aEl.href = '/productores/' + encodeURIComponent(String(id ?? '')) + '/';
+        var meta = document.createElement('span');
+        meta.textContent = producer.municipio + ' - ' + producer.productos_count + ' productos';
+        wrapper.appendChild(meta);
 
-            popupEl.appendChild(strongEl);
-            popupEl.appendChild(brEl);
-            popupEl.appendChild(aEl);
+        var button = document.createElement('button');
+        button.type = 'button';
+        button.textContent = 'Ver ficha';
+        button.addEventListener('click', function () {
+            selectProducer(producer.id, true);
+        });
+        wrapper.appendChild(button);
 
-            marker.bindPopup(popupEl);
+        return wrapper;
+    }
 
+    function selectProducer(id, panToMarker) {
+        var producer = producers.find(function (item) {
+            return item.id === id;
         });
 
-});
+        if (!producer) {
+            return;
+        }
 
+        if (selectedId && markers.has(selectedId)) {
+            markers.get(selectedId).setIcon(createIcon(
+                producers.find(function (item) { return item.id === selectedId; }),
+                false
+            ));
+        }
+
+        selectedId = id;
+
+        if (markers.has(id)) {
+            markers.get(id).setIcon(createIcon(producer, true));
+
+            if (panToMarker) {
+                map.setView([producer.lat, producer.lng], Math.max(map.getZoom(), 13), {
+                    animate: true
+                });
+            }
+        }
+
+        elements.cardAvatar.textContent = producer.nombre.slice(0, 2).toUpperCase();
+        elements.cardTitle.textContent = producer.nombre;
+        elements.cardStatus.textContent = producer.productos_count > 0 ? 'Productor con oferta activa' : 'Productor activo';
+        elements.cardDescription.textContent = producer.descripcion || producer.direccion || 'Productor local registrado en MASXMENOS.';
+        elements.cardProducts.textContent = producer.productos.length
+            ? producer.productos.slice(0, 4).map(function (producto) { return producto.nombre; }).join(', ')
+            : 'Sin productos activos';
+        elements.cardMunicipio.textContent = producer.municipio || 'Sin comunidad registrada';
+        elements.cardPhone.textContent = producer.telefono || 'Sin telefono';
+        elements.cardLink.href = producer.perfil_url;
+        elements.selectedCard.hidden = false;
+    }
+
+    function matchesFilters(producer) {
+        var query = normalize(elements.search.value);
+        var category = elements.category.value;
+        var municipio = elements.municipio.value;
+        var maxDistance = parseFloat(elements.distance.value);
+        var searchableText = normalize([
+            producer.nombre,
+            producer.municipio,
+            producer.direccion,
+            producer.descripcion,
+            producer.productos.map(function (producto) { return producto.nombre; }).join(' ')
+        ].join(' '));
+
+        if (query && !searchableText.includes(query)) {
+            return false;
+        }
+
+        if (category && producer.categorias.indexOf(category) === -1) {
+            return false;
+        }
+
+        if (municipio && producer.municipio !== municipio) {
+            return false;
+        }
+
+        if (elements.withProducts.checked && producer.productos_count === 0) {
+            return false;
+        }
+
+        if (elements.withPhoto.checked && !producer.tiene_foto) {
+            return false;
+        }
+
+        if (distanceKm(cochabambaCenter[0], cochabambaCenter[1], producer.lat, producer.lng) > maxDistance) {
+            return false;
+        }
+
+        return true;
+    }
+
+    function fitVisibleMarkers() {
+        var visible = [];
+
+        markers.forEach(function (marker) {
+            if (map.hasLayer(marker)) {
+                visible.push(marker.getLatLng());
+            }
+        });
+
+        if (visible.length > 1) {
+            map.fitBounds(L.latLngBounds(visible), {
+                padding: [42, 42],
+                maxZoom: 13
+            });
+        } else if (visible.length === 1) {
+            map.setView(visible[0], 13);
+        } else {
+            map.setView(cochabambaCenter, 10);
+        }
+    }
+
+    function applyFilters(shouldFit) {
+        var count = 0;
+
+        producers.forEach(function (producer) {
+            var marker = markers.get(producer.id);
+            var visible = matchesFilters(producer);
+
+            if (visible) {
+                count += 1;
+                if (!map.hasLayer(marker)) {
+                    marker.addTo(map);
+                }
+            } else if (map.hasLayer(marker)) {
+                marker.remove();
+            }
+        });
+
+        elements.results.textContent = count;
+        elements.distanceValue.textContent = elements.distance.value;
+
+        if (selectedId && (!markers.has(selectedId) || !map.hasLayer(markers.get(selectedId)))) {
+            var selectedProducer = producers.find(function (item) { return item.id === selectedId; });
+
+            if (selectedProducer && markers.has(selectedId)) {
+                markers.get(selectedId).setIcon(createIcon(selectedProducer, false));
+            }
+
+            elements.selectedCard.hidden = true;
+            selectedId = null;
+        }
+
+        if (shouldFit) {
+            fitVisibleMarkers();
+        }
+    }
+
+    producers.forEach(function (producer) {
+        var marker = L.marker([producer.lat, producer.lng], {
+            icon: createIcon(producer, false),
+            title: producer.nombre
+        });
+
+        marker.bindPopup(popupContent(producer));
+        marker.on('click', function () {
+            selectProducer(producer.id, false);
+        });
+        markers.set(producer.id, marker);
+    });
+
+    ['input', 'change'].forEach(function (eventName) {
+        elements.search.addEventListener(eventName, function () { applyFilters(false); });
+        elements.category.addEventListener(eventName, function () { applyFilters(true); });
+        elements.municipio.addEventListener(eventName, function () { applyFilters(true); });
+        elements.withProducts.addEventListener(eventName, function () { applyFilters(true); });
+        elements.withPhoto.addEventListener(eventName, function () { applyFilters(true); });
+        elements.distance.addEventListener(eventName, function () { applyFilters(true); });
+    });
+
+    document.getElementById('map-clear-filters').addEventListener('click', function () {
+        elements.search.value = '';
+        elements.category.value = '';
+        elements.municipio.value = '';
+        elements.withProducts.checked = false;
+        elements.withPhoto.checked = false;
+        elements.distance.value = '80';
+        elements.selectedCard.hidden = true;
+        selectedId = null;
+        markers.forEach(function (marker, id) {
+            var producer = producers.find(function (item) { return item.id === id; });
+            marker.setIcon(createIcon(producer, false));
+        });
+        applyFilters(true);
+    });
+
+    document.querySelectorAll('.producer-map-layer-toggle button').forEach(function (button) {
+        button.addEventListener('click', function () {
+            var nextLayer = button.dataset.layer;
+            Object.keys(baseLayers).forEach(function (layerName) {
+                map.removeLayer(baseLayers[layerName]);
+            });
+            baseLayers[nextLayer].addTo(map);
+            document.querySelectorAll('.producer-map-layer-toggle button').forEach(function (item) {
+                item.classList.toggle('active', item === button);
+            });
+        });
+    });
+
+    document.getElementById('map-fit').addEventListener('click', fitVisibleMarkers);
+    document.getElementById('map-open-list').addEventListener('click', function () {
+        window.location.href = "{% url 'lista_productores' %}";
+    });
+    document.getElementById('map-card-close').addEventListener('click', function () {
+        elements.selectedCard.hidden = true;
+        if (selectedId && markers.has(selectedId)) {
+            var producer = producers.find(function (item) { return item.id === selectedId; });
+            markers.get(selectedId).setIcon(createIcon(producer, false));
+        }
+        selectedId = null;
+    });
+
+    document.getElementById('map-locate').addEventListener('click', function () {
+        if (!navigator.geolocation) {
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(function (position) {
+            var latLng = [position.coords.latitude, position.coords.longitude];
+
+            if (userMarker) {
+                userMarker.setLatLng(latLng);
+            } else {
+                userMarker = L.circleMarker(latLng, {
+                    radius: 8,
+                    color: '#0f7a3f',
+                    weight: 3,
+                    fillColor: '#ffffff',
+                    fillOpacity: 1
+                }).addTo(map);
+            }
+
+            map.setView(latLng, 13);
+        });
+    });
+
+    applyFilters(true);
+});
 </script>
 
 {% endblock %}

@@ -90,6 +90,40 @@ class Producto(models.Model):
         return self.nombre
 
 
+class ProductoImagen(models.Model):
+
+    producto = models.ForeignKey(
+        Producto,
+        on_delete=models.CASCADE,
+        related_name='imagenes'
+    )
+
+    imagen = models.ImageField(
+        upload_to='productos/galeria/'
+    )
+
+    texto_alternativo = models.CharField(
+        max_length=150,
+        blank=True
+    )
+
+    orden = models.PositiveIntegerField(
+        default=0
+    )
+
+    fecha_creacion = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    class Meta:
+        verbose_name = "Imagen de producto"
+        verbose_name_plural = "Imagenes de producto"
+        ordering = ['orden', 'id']
+
+    def __str__(self):
+        return f"Imagen de {self.producto.nombre}"
+
+
 class Solicitud(models.Model):
 
     comprador = models.ForeignKey(
@@ -102,6 +136,14 @@ class Solicitud(models.Model):
         'Producto',
         on_delete=models.CASCADE,
         related_name='solicitudes',
+    )
+
+    productor = models.ForeignKey(
+        Productor,
+        on_delete=models.SET_NULL,
+        related_name='solicitudes_recibidas',
+        null=True,
+        blank=True,
     )
 
     cantidad = models.PositiveIntegerField()
@@ -127,6 +169,113 @@ class Solicitud(models.Model):
 
     def __str__(self):
         return f"Solicitud({self.id}) — {self.comprador.username} — {self.producto.nombre}"
+
+
+class ContactoProducto(models.Model):
+
+    CANAL_WHATSAPP = "WHATSAPP"
+
+    CANALES = [
+        (CANAL_WHATSAPP, "WhatsApp"),
+    ]
+
+    comprador = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='contactos_producto',
+    )
+
+    productor = models.ForeignKey(
+        Productor,
+        on_delete=models.SET_NULL,
+        related_name='contactos_recibidos',
+        null=True,
+        blank=True,
+    )
+
+    producto = models.ForeignKey(
+        Producto,
+        on_delete=models.CASCADE,
+        related_name='contactos',
+    )
+
+    canal = models.CharField(
+        max_length=20,
+        choices=CANALES,
+        default=CANAL_WHATSAPP,
+    )
+
+    mensaje = models.TextField(blank=True)
+
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Contacto de producto"
+        verbose_name_plural = "Contactos de producto"
+        ordering = ['-fecha_creacion']
+
+    def __str__(self):
+        return f"Contacto({self.id}) - {self.comprador.username} - {self.producto.nombre}"
+
+
+class SolicitudCompra(models.Model):
+
+    comprador = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='solicitudes_compra',
+    )
+
+    productor = models.ForeignKey(
+        Productor,
+        on_delete=models.SET_NULL,
+        related_name='solicitudes_compra_recibidas',
+        null=True,
+        blank=True,
+    )
+
+    producto = models.ForeignKey(
+        Producto,
+        on_delete=models.CASCADE,
+        related_name='solicitudes_compra',
+    )
+
+    cantidad_solicitada = models.PositiveIntegerField()
+    mensaje_adicional = models.TextField(blank=True)
+
+    PENDIENTE = "PENDIENTE"
+    ACEPTADA = "ACEPTADA"
+    RECHAZADA = "RECHAZADA"
+
+    ESTADOS = [
+        (PENDIENTE, "Pendiente"),
+        (ACEPTADA, "Aceptada"),
+        (RECHAZADA, "Rechazada"),
+    ]
+
+    estado = models.CharField(
+        max_length=20,
+        choices=ESTADOS,
+        default=PENDIENTE,
+    )
+
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Solicitud de compra"
+        verbose_name_plural = "Solicitudes de compra"
+        ordering = ['-fecha_creacion']
+
+    @property
+    def cantidad(self):
+        return self.cantidad_solicitada
+
+    @property
+    def mensaje(self):
+        return self.mensaje_adicional
+
+    def __str__(self):
+        return f"SolicitudCompra({self.id}) - {self.comprador.username} - {self.producto.nombre}"
 
 
 class Cosecha(models.Model):
