@@ -33,25 +33,33 @@
                 </button>
 
                 <div class="catalogo-action-btns">
-                    {% if user.is_authenticated %}
-                        <button class="catalogo-btn-secondary">
-                            {% if user.perfil.rol != 'COMPRADOR' %}
+                    {% if user.is_authenticated and user.perfil %}
+                        {% if user.perfil.rol == 'ADMIN' or user.perfil.rol == 'PRODUCTOR' %}
+                            <button class="catalogo-btn-secondary">
                                 <a href="{% url 'crear_producto' %}" style="text-decoration: none; color: inherit;">
-                                    <i class="bi bi-plus-circle"></i> Soy productor
+                                    <i class="bi bi-plus-circle"></i> Crear producto
                                 </a>
-                            {% else %}
+                            </button>
+                        {% elif user.perfil.rol == 'COMPRADOR' %}
+                            <button class="catalogo-btn-secondary">
                                 <a href="{% url 'dashboard_comprador' %}" style="text-decoration: none; color: inherit;">
                                     Dashboard
                                 </a>
-                            {% endif %}
-                        </button>
+                            </button>
+                        {% else %}
+                            <button class="catalogo-btn-secondary" onclick="mostrarModalLogin()">
+                                Inicia sesión para crear / administrar productos
+                            </button>
+                            <a href="{% url 'login' %}" class="catalogo-btn-secondary">Iniciar sesión</a>
+                        {% endif %}
                     {% else %}
                         <button class="catalogo-btn-secondary" onclick="mostrarModalLogin()">
-                            Soy productor
+                            Inicia sesión para crear / administrar productos
                         </button>
                         <a href="{% url 'login' %}" class="catalogo-btn-secondary">Iniciar sesión</a>
                     {% endif %}
                 </div>
+
 
                 <i class="bi bi-bag-fill catalogo-cart-icon" style="display: none;">
                     <span class="catalogo-cart-badge" style="display: none;">0</span>
@@ -164,17 +172,17 @@
                                 </div>
 
                                 <!-- CONTENIDO -->
-                                <div class="catalogo-product-content">
-                                    <!-- TÍTULO -->
-                                    <h3 class="catalogo-product-title">{{ producto.nombre }}</h3>
+                                    <div class="catalogo-product-content">
+                                    	<!-- TÍTULO -->
+                                    	<h3 class="catalogo-product-title">{{ producto.nombre }}</h3>
 
-                                    <!-- PRECIO -->
-                                    <div class="catalogo-product-price">
-                                        <span class="catalogo-product-price-amount">
-                                            $ {{ producto.precio }}
-                                        </span>
-                                        <span class="catalogo-product-price-unit">/ unidad</span>
-                                    </div>
+                                    	<!-- PRECIO -->
+                                    	<div class="catalogo-product-price">
+                                    		<span class="catalogo-product-price-amount">
+                                    			$ {{ producto.precio }}
+                                    		</span>
+                                    		<span class="catalogo-product-price-unit">/ unidad</span>
+                                    	</div>
 
                                     <!-- INFO TABLA -->
                                     <div class="catalogo-product-info">
@@ -212,21 +220,23 @@
 
                             <!-- ACCIONES -->
                             <div class="catalogo-product-actions" style="padding: 0 1.25rem 1.25rem;">
-                                {% if user.is_authenticated %}
-                                    <button class="catalogo-action-btn catalogo-btn-add" onclick="agregarAlCarrito({{ producto.id }})">
-                                        <i class="bi bi-plus"></i>
-                                    </button>
-                                    <button class="catalogo-action-btn catalogo-btn-icon" onclick="agregarAFavoritos({{ producto.id }})" title="Agregar a favoritos">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
+                                {# Admin o dueño del producto => acciones CRUD #}
+                                {% if user.is_authenticated and user.perfil.rol == 'ADMIN' or user.is_authenticated and producto.productor.usuario == user %}
+                                    <a class="btn btn-warning btn-sm me-2" href="{% url 'editar_producto' producto.id %}">
+                                        <i class="bi bi-pencil"></i> Editar
+                                    </a>
+                                    <a class="btn btn-danger btn-sm" href="{% url 'eliminar_producto' producto.id %}">
+                                        <i class="bi bi-trash"></i> Eliminar
+                                    </a>
                                 {% else %}
-                                    <button class="catalogo-action-btn catalogo-btn-add" onclick="mostrarModalLogin()">
-                                        <i class="bi bi-plus"></i>
-                                    </button>
-                                    <button class="catalogo-action-btn catalogo-btn-icon" onclick="mostrarModalLogin()" title="Agregar a favoritos">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                {% endif %}
+                                    {% if user.is_authenticated %}
+                                        <button class="catalogo-action-btn catalogo-btn-add" onclick="agregarAlCarrito({{ producto.id }})">
+                                            <i class="bi bi-plus"></i> Añadir
+                                        </button>
+                                    {% endif %}
+                                {% endif %} 
+
+                                                            
                             </div>
                         </div>
                     {% endfor %}
