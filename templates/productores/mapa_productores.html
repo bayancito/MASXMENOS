@@ -210,6 +210,11 @@ document.addEventListener('DOMContentLoaded', function () {
             .replace(/[\u0300-\u036f]/g, '');
     }
 
+    function toNumber(value) {
+        var n = Number(value);
+        return Number.isFinite(n) ? n : null;
+    }
+
     function distanceKm(lat1, lng1, lat2, lng2) {
         var radius = 6371;
         var dLat = (lat2 - lat1) * Math.PI / 180;
@@ -300,6 +305,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var category = elements.category.value;
         var municipio = elements.municipio.value;
         var maxDistance = parseFloat(elements.distance.value);
+
         var searchableText = normalize([
             producer.nombre,
             producer.municipio,
@@ -328,7 +334,16 @@ document.addEventListener('DOMContentLoaded', function () {
             return false;
         }
 
-        if (distanceKm(cochabambaCenter[0], cochabambaCenter[1], producer.lat, producer.lng) > maxDistance) {
+        var lat = toNumber(producer.lat);
+        var lng = toNumber(producer.lng);
+
+        // Si no hay coordenadas válidas, no intentamos filtrar por distancia
+        // y consideramos el productor como no visible.
+        if (lat === null || lng === null) {
+            return false;
+        }
+
+        if (distanceKm(cochabambaCenter[0], cochabambaCenter[1], lat, lng) > maxDistance) {
             return false;
         }
 
@@ -392,8 +407,16 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // Crear marcadores solo si hay coordenadas válidas
     producers.forEach(function (producer) {
-        var marker = L.marker([producer.lat, producer.lng], {
+        var lat = toNumber(producer.lat);
+        var lng = toNumber(producer.lng);
+
+        if (lat === null || lng === null) {
+            return;
+        }
+
+        var marker = L.marker([lat, lng], {
             icon: createIcon(producer, false),
             title: producer.nombre
         });
@@ -481,6 +504,16 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     applyFilters(true);
+
+    // Si no hay marcadores visibles ni coordenadas válidas, dejamos un mensaje útil
+    // (sin romper el resto de la UI).
+    var anyVisible = false;
+    markers.forEach(function (marker) {
+        if (map.hasLayer(marker)) anyVisible = true;
+    });
+    if (!anyVisible) {
+        elements.results.textContent = 0;
+    }
 });
 </script>
 

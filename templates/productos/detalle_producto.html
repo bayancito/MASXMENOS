@@ -119,28 +119,38 @@
             </dl>
 
             {% if producto.productor %}
-                <section class="product-producer-box">
-                    <div class="product-producer-avatar">
+                <section class="product-producer-box mxm-producer-card">
+                    <div class="product-producer-avatar" aria-hidden="true">
                         {{ producto.productor.nombre_comercial|slice:":2"|upper }}
                     </div>
-                    <div>
-                        <span>Productor</span>
-                        <h2>
+
+                    <div class="mxm-producer-info">
+                        <div class="mxm-producer-meta">
+                            <span class="mxm-producer-label">Productor</span>
+                            {% if producto.productor.municipio %}
+                                <span class="mxm-producer-pill"><i class="bi bi-geo-alt"></i> {{ producto.productor.municipio }}</span>
+                            {% endif %}
+                        </div>
+
+                        <h2 class="mxm-producer-title">
                             <a href="{% url 'detalle_productor' producto.productor.id %}">
                                 {{ producto.productor.nombre_comercial }}
                             </a>
                         </h2>
-                        <p><i class="bi bi-geo-alt"></i> {{ producto.productor.municipio }}</p>
+
+                        <p class="mxm-producer-subtitle">
+                            {{ producto.productor.descripcion|default:"" }}
+                        </p>
                     </div>
                 </section>
 
-                <div class="product-contact-actions">
+                <div class="product-contact-actions mxm-producer-actions">
                     {% if producto.productor.telefono %}
                         {% if user.is_authenticated and user.perfil and user.perfil.rol == 'COMPRADOR' %}
-                        <a href="#solicitar-producto" class="product-action product-action-primary">
-                            <i class="bi bi-bag-check"></i>
-                            Solicitar producto
-                        </a>
+                            <a href="#solicitar-producto" class="product-action product-action-primary">
+                                <i class="bi bi-bag-check"></i>
+                                Solicitar producto
+                            </a>
                         {% endif %}
                     {% endif %}
                     <a href="{% url 'detalle_productor' producto.productor.id %}" class="product-action product-action-view">
