@@ -8,8 +8,8 @@ from django.views.decorators.http import require_POST
 
 from apps.usuarios.decorators import es_productor_o_admin
 
-from .forms import ProductoForm, SolicitudForm, CosechaForm, SolicitudCompraForm
-from .models import Producto, ProductoImagen, Categoria, Favorito, Solicitud, Cosecha, ContactoProducto, SolicitudCompra
+from .forms import ProductoForm, CosechaForm, SolicitudCompraForm
+from .models import Producto, ProductoImagen, Categoria, Favorito, Cosecha, ContactoProducto, SolicitudCompra
 
 
 def _normalizar_telefono_whatsapp(telefono):
@@ -139,14 +139,13 @@ def detalle_producto(request, pk):
     )
 
 
+@es_productor_o_admin
 def editar_producto(request, pk):
     producto = get_object_or_404(Producto, pk=pk)
 
-    if request.user.is_authenticated and hasattr(request.user, "perfil"):
-        rol = request.user.perfil.rol
-        if rol != "ADMIN":
-            if not (hasattr(producto, "productor") and producto.productor.usuario == request.user):
-                return redirect("lista_productos")
+    if request.user.perfil.rol != "ADMIN":
+        if producto.productor is None or producto.productor.usuario_id != request.user.pk:
+            return redirect("lista_productos")
 
     if request.method == 'POST':
         form = ProductoForm(request.POST, request.FILES, instance=producto)
@@ -348,24 +347,6 @@ def dashboard_comprador(request):
             'ultimas_solicitudes': ultimas_solicitudes,
         }
     )
-
-
-def _get_cosecha_owner_or_403(request, cosecha):
-    """
-    Retorna la cosecha si el usuario es propietario; si no, 403.
-    """
-    if not request.user.is_authenticated or not hasattr(request.user, "perfil"):
-        return None
-
-    rol = request.user.perfil.rol
-    if rol != "PRODUCTOR":
-        return None
-
-    if cosecha.productor != request.user:
-        from django.http import HttpResponseForbidden
-        return HttpResponseForbidden("No tienes permiso para acceder a esta cosecha.")
-
-    return None
 
 
 def crear_cosecha(request):

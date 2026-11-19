@@ -66,13 +66,8 @@ def perfil_usuario(request):
     try:
         perfil = request.user.perfil
     except Exception:
-        perfil = None
-        try:
-            from .models import Perfil
-            perfil, _ = Perfil.objects.get_or_create(user=request.user)
-        except Exception:
-            # Si por alguna razón falla la creación, se re-lanza el error original
-            raise
+        from .models import Perfil
+        perfil, _ = Perfil.objects.get_or_create(user=request.user)
 
     if request.method == "POST":
         form = PerfilForm(

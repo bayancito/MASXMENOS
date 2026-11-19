@@ -1,0 +1,19 @@
+[run]
+source =
+    apps
+    config
+data_file = .coverage.unit
+omit =
+    */venv/*
+    */migrations/*
+    */__pycache__/*
+    */tests.py
+    */test_*.py
+    */settings_test.py
+
+[report]
+show_missing = True
+precision = 2
+
+[html]
+directory = htmlcov
